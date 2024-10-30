@@ -109,7 +109,8 @@ class CodeActAgent(Agent):
         elif isinstance(action, IPythonRunCellAction):
             return f'{action.thought}\n<execute_ipython>\n{action.code}\n</execute_ipython>'
         elif isinstance(action, AgentDelegateAction):
-            return f'{action.thought}\n<execute_browse>\n{action.inputs["task"]}\n</execute_browse>'
+            # return f'{action.thought}\n<execute_browse>\n{action.inputs["task"]}\n</execute_browse>'
+            return f'{action.thought}\n<execute_{action.action_suffix}>\n{action.inputs["task"]}\n</execute_{action.action_suffix}>'
         elif isinstance(action, FileEditAction):
             return f'{action.thought}\n<file_edit path={action.path}>\n{action.content}\n</file_edit>'
         elif isinstance(action, MessageAction):
@@ -215,12 +216,14 @@ class CodeActAgent(Agent):
         messages = self._get_messages(state)
         params = {
             'messages': self.llm.format_messages_for_llm(messages),
-            'stop': [
-                '</execute_ipython>',
-                '</execute_bash>',
-                '</execute_browse>',
-                '</file_edit>',
-            ],
+            # 'stop': [
+            #     '</execute_ipython>',
+            #     '</execute_bash>',
+            #     '</execute_browse>',
+            #     '</file_edit>',
+            # ],
+            'stop': self.stop_sequences,
+            'temperature': 0.0,
         }
 
         response = self.llm.completion(**params)
@@ -228,14 +231,19 @@ class CodeActAgent(Agent):
         return self.action_parser.parse(response)
 
     def _get_messages(self, state: State) -> list[Message]:
-        delegated_task = state.inputs.get('task')
-        if delegated_task is not None:
+        # delegated_task = state.inputs.get('task')
+        # if delegated_task is not None:
+        #     # CodeActAgent is delegated a task
+        #     delegated_task = str(delegated_task)
+        #     self.initial_task_str[0] = delegated_task
+        #     delegated_task = '\n' + delegated_task
+        # else:
+        #     delegated_task = ''
+        delegated_task = ''
+        if state.inputs.get('task') is not None:
             # CodeActAgent is delegated a task
-            delegated_task = str(delegated_task)
-            self.initial_task_str[0] = delegated_task
-            delegated_task = '\n' + delegated_task
-        else:
-            delegated_task = ''
+            delegated_task = '\n' + state.inputs['task']
+            self.initial_task_str = [state.inputs['task']]
 
         messages: list[Message] = [
             Message(
