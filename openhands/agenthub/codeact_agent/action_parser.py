@@ -112,7 +112,8 @@ class CodeActActionParserCmdRun(ActionParser):
         # a command was found
         command_group = self.bash_command.group(1).strip()
         if command_group.strip() == 'exit':
-            return AgentFinishAction(thought=thought)
+            # return AgentFinishAction(thought=thought)
+            return AgentFinishAction(thought=thought, outputs={'content': thought})
         return CmdRunAction(command=command_group, thought=thought)
 
 
