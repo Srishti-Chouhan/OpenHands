@@ -1,23 +1,40 @@
 {% set DEFAULT_EXAMPLE %}
 --- START OF EXAMPLE 1 ---
 
+-- START OF AGENT 1 --
+
 USER: The user message is: "Create a list of numbers from 1 to 10, and display them in a web page at port 5000. There's an existing Python file `app.py` that you can use."
-Execute the following plan to fulfill it:
-# Phases
-## Phase 1
-- description: Edit the existing Python file `app.py` to insert the code for starting a web server, at the end of the file.
-- reason: The existing Python file is missing the code to start the web server. Normally, the server is started using the `app.run(port=5000)` command. This phase will add this necessary code in a __main__ block to start the server. You can use the `insert_content_at_line` function or other appropriate ways to add the code.
-- expected_state: The Python file `app.py` is updated with the code to start the web server.
-<file_path> /workspace/app.py </file_path>
-<expected_content>
-8|
-9|if __name__ == '__main__':
-10|    app.run(port=5000)
-</expected_content>
-## Phase 2
-- description: Run the Python file `app.py` to display the list of numbers on a web page at port 5000.
-- reason: After updating the Python file, we need to run it to display the list of numbers on a web page. The command a shell command can be: `python3 app.py`.
-- expected_state: The list of numbers is displayed on a web page at port 5000.
+This is the global plan:
+
+{
+    "Phase 1": {
+        "reason": "The existing Python file is missing the code to start the web server. Adding the code in a `__main__` block enables the server to run and listen on port 5000. This phase will add the necessary code with `app.run(port=5000)`. Using the `insert_content_at_line` function will ensure it is inserted in the correct place.",
+        "description": "Edit the existing Python file `app.py` to insert the code for starting a web server, at the end of the file.",
+        "expected_state": "The Python file `app.py` is updated with the code to start the web server.",
+        "file_path": "/workspace/app.py",
+        "expected_content": "8|\n9|if __name__ == '__main__':\n10|    app.run(port=5000)",
+        "status": "assigned",
+        "feedback": "in progress"
+    },
+    "Phase 2": {
+        "reason": "After updating the Python file, we need to run it to display the list of numbers on a web page. Running `python3 app.py` in a shell will initiate the server on port 5000, displaying the numbers when accessed.",
+        "description": "Run the Python file `app.py` to display the list of numbers on a web page at port 5000.",
+        "expected_state": "The list of numbers is displayed on a web page at port 5000.",
+        "status": "assigned",
+        "feedback": "in progress"
+    }
+}
+
+Your task is to execute the following phase:
+"Phase 1": {
+        "reason": "The existing Python file is missing the code to start the web server. Adding the code in a `__main__` block enables the server to run and listen on port 5000. This phase will add the necessary code with `app.run(port=5000)`. Using the `insert_content_at_line` function will ensure it is inserted in the correct place.",
+        "description": "Edit the existing Python file `app.py` to insert the code for starting a web server, at the end of the file.",
+        "expected_state": "The Python file `app.py` is updated with the code to start the web server.",
+        "file_path": "/workspace/app.py",
+        "expected_content": "8|\n9|if __name__ == '__main__':\n10|    app.run(port=5000)",
+        "status": "assigned",
+        "feedback": "in progress"
+    }
 
 ASSISTANT:
 Let's start with the first phase: editing the Python file `app.py` to insert the code for starting a web server at line 8. I will open the file at that line to check its current content:
@@ -70,7 +87,69 @@ OBSERVATION:
 [File updated (edited at line 9). Please review the changes and make sure they are correct (correct indentation, no duplicate lines, etc). Edit the file again if necessary.]
 
 ASSISTANT:
-I have updated the Python file `app.py` to properly start the web server and display a list of numbers from 1 to 10 when you run it. Let's proceed to phase 2 to run the Python file:
+I have updated the Python file `app.py` to properly start the web server and display a list of numbers from 1 to 10 when you run it.
+
+Phase 1 has been sucessfully completed. Let's proceed to update the global plan based on the completion of this phase:
+
+<phase_transition>
+{
+    "Phase 1": {
+        "reason": "The existing Python file is missing the code to start the web server. Adding the code in a `__main__` block enables the server to run and listen on port 5000. This phase will add the necessary code with `app.run(port=5000)`. Using the `insert_content_at_line` function will ensure it is inserted in the correct place.",
+        "description": "Edit the existing Python file `app.py` to insert the code for starting a web server, at the end of the file.",
+        "expected_state": "The Python file `app.py` is updated with the code to start the web server.",
+        "file_path": "/workspace/app.py",
+        "expected_content": "8|\n9|if __name__ == '__main__':\n10|    app.run(port=5000)",
+        "status": "done",
+        "feedback": "Python file `app.py` successfully updated to start the server at port 5000."
+    },
+    "Phase 2": {
+        "reason": "After updating the Python file, we need to run it to display the list of numbers on a web page. Running `python3 app.py` in a shell will initiate the server on port 5000, displaying the numbers when accessed.",
+        "description": "Run the Python file `app.py` to display the list of numbers on a web page at port 5000.",
+        "expected_state": "The list of numbers is displayed on a web page at port 5000.",
+        "status": "assigned",
+        "feedback": "in progress"
+    }
+}
+</phase_transition>
+<finish></finish>
+
+-- END OF AGENT 1 --
+
+-- START OF AGENT 2 --
+
+USER: The user message is: "Create a list of numbers from 1 to 10, and display them in a web page at port 5000. There's an existing Python file `app.py` that you can use."
+This is the global plan:
+
+{
+    "Phase 1": {
+        "reason": "The existing Python file is missing the code to start the web server. Adding the code in a `__main__` block enables the server to run and listen on port 5000. This phase will add the necessary code with `app.run(port=5000)`. Using the `insert_content_at_line` function will ensure it is inserted in the correct place.",
+        "description": "Edit the existing Python file `app.py` to insert the code for starting a web server, at the end of the file.",
+        "expected_state": "The Python file `app.py` is updated with the code to start the web server.",
+        "file_path": "/workspace/app.py",
+        "expected_content": "8|\n9|if __name__ == '__main__':\n10|    app.run(port=5000)",
+        "status": "done",
+        "feedback": "Python file `app.py` successfully updated to start the server at port 5000."
+    },
+    "Phase 2": {
+        "reason": "After updating the Python file, we need to run it to display the list of numbers on a web page. Running `python3 app.py` in a shell will initiate the server on port 5000, displaying the numbers when accessed.",
+        "description": "Run the Python file `app.py` to display the list of numbers on a web page at port 5000.",
+        "expected_state": "The list of numbers is displayed on a web page at port 5000.",
+        "status": "assigned",
+        "feedback": "in progress"
+    }
+}
+
+Your task is to execute the following phase:
+"Phase 2": {
+        "reason": "After updating the Python file, we need to run it to display the list of numbers on a web page. Running `python3 app.py` in a shell will initiate the server on port 5000, displaying the numbers when accessed.",
+        "description": "Run the Python file `app.py` to display the list of numbers on a web page at port 5000.",
+        "expected_state": "The list of numbers is displayed on a web page at port 5000.",
+        "status": "assigned",
+        "feedback": "in progress"
+    }
+
+ASSISTANT:
+Let's execute phase 2 by running the Python file:
 <execute_bash>
 python3 app.py > server.log 2>&1 &
 </execute_bash>
@@ -140,23 +219,61 @@ WARNING: This is a development server. Do not use it in a production deployment.
 Press CTRL+C to quit
 
 ASSISTANT:
-The server is running on port 5000 with PID 124. You can access the list of numbers by visiting http://127.0.0.1:5000. The tasks are now complete.
-Summary:
-- Edited the existing Python file `app.py` to insert the code for starting a web server.
-- Ran the Python file to display the list of numbers on a web page at port 5000.
+The server is running on port 5000 with PID 124. You can access the list of numbers by visiting http://127.0.0.1:5000.
+
+Phase 2 has been sucessfully completed. Let's proceed to update the global plan based on the completion of this phase:
+
+<phase_transition>
+{
+    "Phase 1": {
+        "reason": "The existing Python file is missing the code to start the web server. Adding the code in a `__main__` block enables the server to run and listen on port 5000. This phase will add the necessary code with `app.run(port=5000)`. Using the `insert_content_at_line` function will ensure it is inserted in the correct place.",
+        "description": "Edit the existing Python file `app.py` to insert the code for starting a web server, at the end of the file.",
+        "expected_state": "The Python file `app.py` is updated with the code to start the web server.",
+        "file_path": "/workspace/app.py",
+        "expected_content": "8|\n9|if __name__ == '__main__':\n10|    app.run(port=5000)",
+        "status": "done",
+        "feedback": "Python file `app.py` successfully updated to start the server at port 5000."
+    },
+    "Phase 2": {
+        "reason": "After updating the Python file, we need to run it to display the list of numbers on a web page. The command `python3 app.py` initiates the server on port 5000, displaying the numbers when accessed.",
+        "description": "Run the Python file `app.py` to display the list of numbers on a web page at port 5000.",
+        "expected_state": "The list of numbers is displayed on a web page at port 5000.",
+        "status": "done",
+        "feedback": "Ran the Python file to display the list of numbers on a web page at port 5000."
+    }
+}
+</phase_transition>
 <finish></finish>
+
+-- END OF AGENT 2 --
 
 --- END OF EXAMPLE 1 ---
 
 --- START OF EXAMPLE 2 ---
 
+-- START OF AGENT 1 --
+
 USER: The user message is: "Now browse the newly started server's homepage and show me the content."
-Execute the following plan to fulfill it:
-# Phases
-## Phase 1
-- description: Browse the server's homepage at http://127.0.0.1:5000
-- reason: To verify that the server is running and displaying the list of numbers correctly, we need to browse the server's homepage. We can use the `execute_browse` function to access the URL.
-- expected_state: The content of the server's homepage is retrieved.
+This is the global plan:
+
+{
+    "Phase 1": {
+        "reason": "To verify that the server is running and displaying the list of numbers correctly, we need to browse the server's homepage. We can use the `execute_browse` function to access the URL.",
+        "description": "Browse the server's homepage at http://127.0.0.1:5000",
+        "expected_state": "The content of the server's homepage is retrieved.",
+        "status": "assigned",
+        "feedback": "in progress"
+    }
+}
+
+Your task is to execute the following phase:
+"Phase 1": {
+        "reason": "To verify that the server is running and displaying the list of numbers correctly, we need to browse the server's homepage. We can use the `execute_browse` function to access the URL.",
+        "description": "Browse the server's homepage at http://127.0.0.1:5000",
+        "expected_state": "The content of the server's homepage is retrieved.",
+        "status": "assigned",
+        "feedback": "in progress"
+    }
 
 ASSISTANT:
 Sure! Let me start the first phase by browsing the server's homepage at http://127.0.0.1:5000:
@@ -169,10 +286,24 @@ OBSERVATION:
 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 ASSISTANT:
-The content of the server's homepage is "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]". The tasks are now complete.
-Summary:
-- Browsed the server's homepage at http://127.0.0.1:5000 and retrieved the content "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]".
+The content of the server's homepage is "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]".
+
+Phase 1 has been sucessfully completed. Let's proceed to update the global plan based on the completion of this phase:
+
+<phase_transition>
+{
+    "Phase 1": {
+        "reason": "To verify that the server is running and displaying the list of numbers correctly, we need to browse the server's homepage. We can use the `execute_browse` function to access the URL.",
+        "description": "Browse the server's homepage at http://127.0.0.1:5000",
+        "expected_state": "The content of the server's homepage is retrieved.",
+        "status": "done",
+        "feedback": "Browsed the server's homepage at http://127.0.0.1:5000 and retrieved the content '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]'."
+    }
+}
+</phase_transition>
 <finish></finish>
+
+-- END OF AGENT 1 --
 
 --- END OF EXAMPLE 2 ---
 
@@ -180,24 +311,32 @@ Summary:
 
 USER: The user message is: "Now kill the server, make it display the numbers in a table format."
 Execute the following plan to fulfill it:
-# Phases
-## Phase 1
-- description: Stop the server running on port 5000.
-- reason: The server needs to be stopped before modifying the Python code.
-- expected_state: The server is stopped.
-## Phase 2
-- description: Modify the Python code to display the numbers in a table format.
-- reason: The current code returns the numbers as a string, which is incorrect. We need to modify it, starting at line 6, to display the numbers in a table format by using HTML tags for table rows and cells.
-- expected_state: The Python code is updated to display the numbers in a table format.
-<file_path> /workspace/app.py </file_path>
-<expected_content>
-6|    numbers = list(range(1, 11))
-7|    return "<table>" + "".join([f"<tr><td>{num}</td></tr>" for num in numbers]) + "</table>"
-</expected_content>
-## Phase 3
-- description: Run the Python file again to display the numbers in a table format on the web page at port 5000.
-- reason: After modifying the Python code, we need to run the file again to display the numbers in the expected table format.
-- expected_state: The numbers are displayed in a table format on the web page.
+
+{
+    "Phase 1": {
+        "reason": "The server needs to be stopped before modifying the Python code.",
+        "description": "Stop the server running on port 5000.",
+        "expected_state": "The server is stopped.",
+        "status": "assigned",
+        "feedback": "in progress"
+    },
+    "Phase 2": {
+        "reason": "The current code returns the numbers as a string, which is incorrect. We need to modify it, starting at line 6, to display the numbers in a table format by using HTML tags for table rows and cells.",
+        "description": "Modify the Python code to display the numbers in a table format.",
+        "expected_state": "The Python code is updated to display the numbers in a table format.",
+        "file_path": "/workspace/app.py",
+        "expected_content": "6|    numbers = list(range(1, 11))\n7|    return \"<table>\" + \"\".join([f\"<tr><td>{num}</td></tr>\" for num in numbers]) + \"</table>\"",
+        "status": "assigned",
+        "feedback": "in progress"
+    },
+    "Phase 3": {
+        "reason": "After modifying the Python code, we need to run the file again to display the numbers in the expected table format.",
+        "description": "Run the Python file again to display the numbers in a table format on the web page at port 5000.",
+        "expected_state": "The numbers are displayed in a table format on the web page.",
+        "status": "assigned",
+        "feedback": "in progress"
+    }
+}
 
 ASSISTANT:
 Sure! Let me execute the first phase to stop the server first:
