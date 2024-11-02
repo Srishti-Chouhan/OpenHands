@@ -149,7 +149,7 @@ Your task is to execute the following phase:
     }
 
 ASSISTANT:
-Let's execute phase 2 by running the Python file:
+Let's execute phase 2:
 <execute_bash>
 python3 app.py > server.log 2>&1 &
 </execute_bash>
@@ -309,8 +309,10 @@ Phase 1 has been sucessfully completed. Let's proceed to update the global plan 
 
 --- START OF EXAMPLE 3 ---
 
+-- START OF AGENT 1 --
+
 USER: The user message is: "Now kill the server, make it display the numbers in a table format."
-Execute the following plan to fulfill it:
+This is the global plan:
 
 {
     "Phase 1": {
@@ -338,6 +340,15 @@ Execute the following plan to fulfill it:
     }
 }
 
+Your task is to execute the following phase:
+"Phase 1": {
+    "reason": "The server needs to be stopped before modifying the Python code.",
+    "description": "Stop the server running on port 5000.",
+    "expected_state": "The server is stopped.",
+    "status": "assigned",
+    "feedback": "in progress"
+}
+
 ASSISTANT:
 Sure! Let me execute the first phase to stop the server first:
 <execute_bash>
@@ -349,12 +360,91 @@ OBSERVATION:
 [1]+  Terminated              python3 app.py > server.log 2>&1
 
 ASSISTANT:
-The server has been stopped. Let me move to the second phase to open the Python file at line 6 and modify it.
+The server has been stopped.
+
+Phase 1 has been sucessfully completed. Let's proceed to update the global plan based on the completion of this phase:
+
+<phase_transition>
+{
+    "Phase 1": {
+        "reason": "The server needs to be stopped before modifying the Python code.",
+        "description": "Stop the server running on port 5000.",
+        "expected_state": "The server is stopped.",
+        "status": "done",
+        "feedback": "The server has been stopped."
+    },
+    "Phase 2": {
+        "reason": "The current code returns the numbers as a string, which is incorrect. We need to modify it, starting at line 6, to display the numbers in a table format by using HTML tags for table rows and cells.",
+        "description": "Modify the Python code to display the numbers in a table format.",
+        "expected_state": "The Python code is updated to display the numbers in a table format.",
+        "file_path": "/workspace/app.py",
+        "expected_content": "6|    numbers = list(range(1, 11))\n7|    return \"<table>\" + \"\".join([f\"<tr><td>{num}</td></tr>\" for num in numbers]) + \"</table>\"",
+        "status": "assigned",
+        "feedback": "in progress"
+    },
+    "Phase 3": {
+        "reason": "After modifying the Python code, we need to run the file again to display the numbers in the expected table format.",
+        "description": "Run the Python file again to display the numbers in a table format on the web page at port 5000.",
+        "expected_state": "The numbers are displayed in a table format on the web page.",
+        "status": "assigned",
+        "feedback": "in progress"
+    }
+}
+</phase_transition>
+<finish></finish>
+
+-- END OF AGENT 1 --
+
+-- START OF AGENT 2 --
+
+USER: The user message is: "Now kill the server, make it display the numbers in a table format."
+This is the global plan:
+
+{
+    "Phase 1": {
+        "reason": "The server needs to be stopped before modifying the Python code.",
+        "description": "Stop the server running on port 5000.",
+        "expected_state": "The server is stopped.",
+        "status": "done",
+        "feedback": "The server has been stopped."
+    },
+    "Phase 2": {
+        "reason": "The current code returns the numbers as a string, which is incorrect. We need to modify it, starting at line 6, to display the numbers in a table format by using HTML tags for table rows and cells.",
+        "description": "Modify the Python code to display the numbers in a table format.",
+        "expected_state": "The Python code is updated to display the numbers in a table format.",
+        "file_path": "/workspace/app.py",
+        "expected_content": "6|    numbers = list(range(1, 11))\n7|    return \"<table>\" + \"\".join([f\"<tr><td>{num}</td></tr>\" for num in numbers]) + \"</table>\"",
+        "status": "assigned",
+        "feedback": "in progress"
+    },
+    "Phase 3": {
+        "reason": "After modifying the Python code, we need to run the file again to display the numbers in the expected table format.",
+        "description": "Run the Python file again to display the numbers in a table format on the web page at port 5000.",
+        "expected_state": "The numbers are displayed in a table format on the web page.",
+        "status": "assigned",
+        "feedback": "in progress"
+    }
+}
+
+Your task is to execute the following phase:
+"Phase 2": {
+    "reason": "The current code returns the numbers as a string, which is incorrect. We need to modify it, starting at line 6, to display the numbers in a table format by using HTML tags for table rows and cells.",
+    "description": "Modify the Python code to display the numbers in a table format.",
+    "expected_state": "The Python code is updated to display the numbers in a table format.",
+    "file_path": "/workspace/app.py",
+    "expected_content": "6|    numbers = list(range(1, 11))\n7|    return \"<table>\" + \"\".join([f\"<tr><td>{num}</td></tr>\" for num in numbers]) + \"</table>\"",
+    "status": "assigned",
+    "feedback": "in progress"
+}
+
+ASSISTANT:
+Let's execute phase 2:
 <execute_ipython>
 open_file('app.py', 6)
 </execute_ipython>
 
 USER:
+OBSERVATION:
 [File: /workspace/app.py (10 lines total)]
 (this is the beginning of the file)
 1|from flask import Flask
@@ -380,7 +470,7 @@ edit_file_by_replace(
 </execute_ipython>
 
 USER:
-Observation:
+OBSERVATION:
 [File: /workspace/app.py (10 lines total after edit)]
 (this is the beginning of the file)
 1|from flask import Flask
@@ -397,22 +487,126 @@ Observation:
 [File updated (edited at line 7). Please review the changes and make sure they are correct (correct indentation, no duplicate lines, etc). Edit the file again if necessary.]
 
 ASSISTANT:
-Now, let's move the third phase: to run the updated file:
+The numbers are now displayed in a table format.
+
+Phase 2 has been sucessfully completed. Let's proceed to update the global plan based on the completion of this phase:
+
+<phase_transition>
+{
+    "Phase 1": {
+        "reason": "The server needs to be stopped before modifying the Python code.",
+        "description": "Stop the server running on port 5000.",
+        "expected_state": "The server is stopped.",
+        "status": "done",
+        "feedback": "The server has been stopped."
+    },
+    "Phase 2": {
+        "reason": "The current code returns the numbers as a string, which is incorrect. We need to modify it, starting at line 6, to display the numbers in a table format by using HTML tags for table rows and cells.",
+        "description": "Modify the Python code to display the numbers in a table format.",
+        "expected_state": "The Python code is updated to display the numbers in a table format.",
+        "file_path": "/workspace/app.py",
+        "expected_content": "6|    numbers = list(range(1, 11))\n7|    return \"<table>\" + \"\".join([f\"<tr><td>{num}</td></tr>\" for num in numbers]) + \"</table>\"",
+        "status": "done",
+        "feedback": "The numbers are now displayed in a table format."
+    },
+    "Phase 3": {
+        "reason": "After modifying the Python code, we need to run the file again to display the numbers in the expected table format.",
+        "description": "Run the Python file again to display the numbers in a table format on the web page at port 5000.",
+        "expected_state": "The numbers are displayed in a table format on the web page.",
+        "status": "assigned",
+        "feedback": "in progress"
+    }
+}
+</phase_transition>
+<finish></finish>
+
+-- END OF AGENT 2 --
+
+-- START OF AGENT 3 --
+
+USER: The user message is: "Now kill the server, make it display the numbers in a table format."
+This is the global plan:
+
+{
+    "Phase 1": {
+        "reason": "The server needs to be stopped before modifying the Python code.",
+        "description": "Stop the server running on port 5000.",
+        "expected_state": "The server is stopped.",
+        "status": "done",
+        "feedback": "The server has been stopped."
+    },
+    "Phase 2": {
+        "reason": "The current code returns the numbers as a string, which is incorrect. We need to modify it, starting at line 6, to display the numbers in a table format by using HTML tags for table rows and cells.",
+        "description": "Modify the Python code to display the numbers in a table format.",
+        "expected_state": "The Python code is updated to display the numbers in a table format.",
+        "file_path": "/workspace/app.py",
+        "expected_content": "6|    numbers = list(range(1, 11))\n7|    return \"<table>\" + \"\".join([f\"<tr><td>{num}</td></tr>\" for num in numbers]) + \"</table>\"",
+        "status": "done",
+        "feedback": "The numbers are now displayed in a table format."
+    },
+    "Phase 3": {
+        "reason": "After modifying the Python code, we need to run the file again to display the numbers in the expected table format.",
+        "description": "Run the Python file again to display the numbers in a table format on the web page at port 5000.",
+        "expected_state": "The numbers are displayed in a table format on the web page.",
+        "status": "assigned",
+        "feedback": "in progress"
+    }
+}
+
+Your task is to execute the following phase:
+"Phase 3": {
+  "reason": "After modifying the Python code, we need to run the file again to display the numbers in the expected table format.",
+  "description": "Run the Python file again to display the numbers in a table format on the web page at port 5000.",
+  "expected_state": "The numbers are displayed in a table format on the web page.",
+  "status": "assigned",
+  "feedback": "in progress"
+}
+
+ASSISTANT:
+Let's execute phase 3:
 <execute_bash>
 python3 app.py > server.log 2>&1 &
 </execute_bash>
 
 USER:
-Observation:
+OBSERVATION:
 [1] 126
 
 ASSISTANT:
 The server is running on port 5000 with PID 126. You can access the list of numbers in a table format by visiting http://127.0.0.1:5000. The tasks are now complete.
-Summary:
-- Stopped the server running on port 5000.
-- Modified the Python code to display the numbers in a table format.
-- Ran the Python file again to display the numbers in a table format on the web page at port 5000.
+
+Phase 3 has been sucessfully completed. Let's proceed to update the global plan based on the completion of this phase:
+
+<phase_transition>
+{
+    "Phase 1": {
+        "reason": "The server needs to be stopped before modifying the Python code.",
+        "description": "Stop the server running on port 5000.",
+        "expected_state": "The server is stopped.",
+        "status": "done",
+        "feedback": "The server has been stopped."
+    },
+    "Phase 2": {
+        "reason": "The current code returns the numbers as a string, which is incorrect. We need to modify it, starting at line 6, to display the numbers in a table format by using HTML tags for table rows and cells.",
+        "description": "Modify the Python code to display the numbers in a table format.",
+        "expected_state": "The Python code is updated to display the numbers in a table format.",
+        "file_path": "/workspace/app.py",
+        "expected_content": "6|    numbers = list(range(1, 11))\n7|    return \"<table>\" + \"\".join([f\"<tr><td>{num}</td></tr>\" for num in numbers]) + \"</table>\"",
+        "status": "done",
+        "feedback": "The numbers are now displayed in a table format."
+    },
+    "Phase 3": {
+        "reason": "After modifying the Python code, we need to run the file again to display the numbers in the expected table format.",
+        "description": "Run the Python file again to display the numbers in a table format on the web page at port 5000.",
+        "expected_state": "The numbers are displayed in a table format on the web page.",
+        "status": "done",
+        "feedback": "The updated file is running on port 5000 with PID 126 "
+    }
+}
+</phase_transition>
 <finish></finish>
+
+-- END OF AGENT 3 --
 
 --- END OF EXAMPLE 3 ---
 {% endset %}
