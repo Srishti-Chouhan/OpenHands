@@ -1,6 +1,7 @@
+import json
 import re
 
-from agenthub.codeact_agent.action_parser import (
+from openhands.agenthub.codeact_agent.action_parser import (
     CodeActActionParserAgentDelegate,
     CodeActActionParserCmdRun,
     CodeActActionParserFinish,
@@ -8,11 +9,11 @@ from agenthub.codeact_agent.action_parser import (
     CodeActActionParserMessage,
     CodeActResponseParser,
 )
-
 from openhands.controller.action_parser import ActionParser
 from openhands.events.action import (
     Action,
     AgentDelegateAction,
+    AgentFinishAction,
 )
 
 
@@ -98,4 +99,66 @@ class CoActActionParserGlobalPlan(ActionParser):
                 'task': f'The user message is: {self.initial_task_str[0]}.\nExecute the following plan to fulfill it:\n{global_plan_actions}'
             },
             action_suffix='global_plan',
+        )
+
+
+# give a class for executing next agent using the CoActActionParserGlobalPlan pattern
+class CoActActionParserPhasePlan(ActionParser):
+    """Parser action:
+    - AgentDelegateAction(agent, inputs) - delegate action for (sub)task
+    """
+
+    def __init__(
+        self,
+        initial_task_str: list | None = None,
+    ):
+        self.phase_plan: re.Match | None = None
+        self.initial_task_str = initial_task_str or ['']
+
+    def check_condition(self, action_str: str) -> bool:
+        self.phase_plan = re.search(
+            r'<phase_transition>(.*)</phase_transition>', action_str, re.DOTALL
+        )
+        return self.phase_plan is not None
+
+    def parse(self, action_str: str) -> Action:
+        assert (
+            self.phase_plan is not None
+        ), 'self.phase_plan should not be None when parse is called'
+        thought = action_str.replace(self.phase_plan.group(0), '').strip()
+        phase_plan_actions = self.phase_plan.group(1).strip()
+
+        # Some extra processing when doing swe-bench eval: extract text up to and including '--- END ISSUE ---'
+        issue_text_pattern = re.compile(r'(.*--- END ISSUE ---)', re.DOTALL)
+        issue_text_match = issue_text_pattern.match(self.initial_task_str[0])
+
+        if issue_text_match:
+            self.initial_task_str[0] = issue_text_match.group(1)
+
+        # save the phase plan in a dict, and see which is the phase to be executed next
+        # if the phase is the last one, then return the agent finish action
+        # else, return the agent delegate action
+        # the agent delegate action will be used to execute the next phase
+        phase_plan_json = json.loads(phase_plan_actions)
+        phase_to_execute = None
+        for phase in phase_plan_json:
+            if phase['status'] == 'done':
+                continue
+            else:
+                phase_to_execute = phase
+                break
+
+        if phase_to_execute is None:
+            return AgentFinishAction(
+                thought='',
+                outputs={'content': ''},
+            )
+
+        return AgentDelegateAction(
+            agent='CoActExecutorAgent',
+            thought=thought,
+            inputs={
+                'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{phase_plan_actions}\nYour task is to execute:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
+            },
+            action_suffix='phase_plan',
         )
