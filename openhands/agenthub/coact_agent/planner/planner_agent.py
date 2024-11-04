@@ -1,8 +1,7 @@
 import os
 
-from agenthub.coact_agent.planner.action_parser import PlannerResponseParser
-from agenthub.codeact_agent.codeact_agent import CodeActAgent
-
+from openhands.agenthub.coact_agent.planner.action_parser import PlannerResponseParser
+from openhands.agenthub.codeact_agent.codeact_agent import CodeActAgent
 from openhands.core.config import AgentConfig
 from openhands.llm.llm import LLM
 from openhands.runtime.plugins.agent_skills.agentskills import (
