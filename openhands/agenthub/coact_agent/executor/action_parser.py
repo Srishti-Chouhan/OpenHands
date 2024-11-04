@@ -93,7 +93,7 @@ class CoActActionParserPhaseTransition(ActionParser):
 
     def check_condition(self, action_str: str) -> bool:
         self.request = re.search(
-            r'<execute_phase_transition>(.*)</execute_phase_transition>',
+            r'<execute_global_plan>(.*)</execute_global_plan>',
             action_str,
             re.DOTALL,
         )

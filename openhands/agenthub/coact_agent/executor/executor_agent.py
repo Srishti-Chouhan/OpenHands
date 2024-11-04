@@ -1,8 +1,7 @@
 import os
 
-from agenthub.coact_agent.executor.action_parser import ExecutorResponseParser
-from agenthub.codeact_agent.codeact_agent import CodeActAgent
-
+from openhands.agenthub.coact_agent.executor.action_parser import ExecutorResponseParser
+from openhands.agenthub.codeact_agent.codeact_agent import CodeActAgent
 from openhands.core.config import AgentConfig
 from openhands.llm.llm import LLM
 from openhands.runtime.plugins.agent_skills import AgentSkillsRequirement

@@ -5,7 +5,6 @@
 
 USER: The user message is: "Create a list of numbers from 1 to 10, and display them in a web page at port 5000. There's an existing Python file `app.py` that you can use."
 This is the global plan:
-
 {
     "Phase 1": {
         "reason": "The existing Python file is missing the code to start the web server. Adding the code in a `__main__` block enables the server to run and listen on port 5000. This phase will add the necessary code with `app.run(port=5000)`. Using the `insert_content_at_line` function will ensure it is inserted in the correct place.",
@@ -91,6 +90,9 @@ I have updated the Python file `app.py` to properly start the web server and dis
 
 Phase 1 has been sucessfully completed. Let's proceed to update the global plan based on the completion of this phase:
 
+<execute_global_plan>
+USER: The user message is: "Create a list of numbers from 1 to 10, and display them in a web page at port 5000. There's an existing Python file `app.py` that you can use."
+This is the global plan:
 <phase_transition>
 {
     "Phase 1": {
@@ -111,7 +113,7 @@ Phase 1 has been sucessfully completed. Let's proceed to update the global plan 
     }
 }
 </phase_transition>
-<finish></finish>
+</execute_global_plan>
 
 -- END OF AGENT 1 --
 
@@ -119,7 +121,6 @@ Phase 1 has been sucessfully completed. Let's proceed to update the global plan 
 
 USER: The user message is: "Create a list of numbers from 1 to 10, and display them in a web page at port 5000. There's an existing Python file `app.py` that you can use."
 This is the global plan:
-
 {
     "Phase 1": {
         "reason": "The existing Python file is missing the code to start the web server. Adding the code in a `__main__` block enables the server to run and listen on port 5000. This phase will add the necessary code with `app.run(port=5000)`. Using the `insert_content_at_line` function will ensure it is inserted in the correct place.",
@@ -223,6 +224,9 @@ The server is running on port 5000 with PID 124. You can access the list of numb
 
 Phase 2 has been sucessfully completed. Let's proceed to update the global plan based on the completion of this phase:
 
+<execute_global_plan>
+USER: The user message is: "Create a list of numbers from 1 to 10, and display them in a web page at port 5000. There's an existing Python file `app.py` that you can use."
+This is the global plan:
 <phase_transition>
 {
     "Phase 1": {
@@ -243,6 +247,7 @@ Phase 2 has been sucessfully completed. Let's proceed to update the global plan 
     }
 }
 </phase_transition>
+</execute_global_plan>
 <finish></finish>
 
 -- END OF AGENT 2 --
@@ -255,7 +260,6 @@ Phase 2 has been sucessfully completed. Let's proceed to update the global plan 
 
 USER: The user message is: "Now browse the newly started server's homepage and show me the content."
 This is the global plan:
-
 {
     "Phase 1": {
         "reason": "To verify that the server is running and displaying the list of numbers correctly, we need to browse the server's homepage. We can use the `execute_browse` function to access the URL.",
@@ -290,6 +294,9 @@ The content of the server's homepage is "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]".
 
 Phase 1 has been sucessfully completed. Let's proceed to update the global plan based on the completion of this phase:
 
+<execute_global_plan>
+USER: The user message is: "Now browse the newly started server's homepage and show me the content."
+This is the global plan:
 <phase_transition>
 {
     "Phase 1": {
@@ -301,6 +308,7 @@ Phase 1 has been sucessfully completed. Let's proceed to update the global plan 
     }
 }
 </phase_transition>
+</execute_global_plan>
 <finish></finish>
 
 -- END OF AGENT 1 --
@@ -313,7 +321,6 @@ Phase 1 has been sucessfully completed. Let's proceed to update the global plan 
 
 USER: The user message is: "Now kill the server, make it display the numbers in a table format."
 This is the global plan:
-
 {
     "Phase 1": {
         "reason": "The server needs to be stopped before modifying the Python code.",
@@ -364,6 +371,9 @@ The server has been stopped.
 
 Phase 1 has been sucessfully completed. Let's proceed to update the global plan based on the completion of this phase:
 
+<execute_global_plan>
+USER: The user message is: "Now kill the server, make it display the numbers in a table format."
+This is the global plan:
 <phase_transition>
 {
     "Phase 1": {
@@ -391,7 +401,7 @@ Phase 1 has been sucessfully completed. Let's proceed to update the global plan 
     }
 }
 </phase_transition>
-<finish></finish>
+</execute_global_plan>
 
 -- END OF AGENT 1 --
 
@@ -399,7 +409,6 @@ Phase 1 has been sucessfully completed. Let's proceed to update the global plan 
 
 USER: The user message is: "Now kill the server, make it display the numbers in a table format."
 This is the global plan:
-
 {
     "Phase 1": {
         "reason": "The server needs to be stopped before modifying the Python code.",
@@ -491,6 +500,9 @@ The numbers are now displayed in a table format.
 
 Phase 2 has been sucessfully completed. Let's proceed to update the global plan based on the completion of this phase:
 
+<execute_global_plan>
+USER: The user message is: "Now kill the server, make it display the numbers in a table format."
+This is the global plan:
 <phase_transition>
 {
     "Phase 1": {
@@ -518,7 +530,7 @@ Phase 2 has been sucessfully completed. Let's proceed to update the global plan 
     }
 }
 </phase_transition>
-<finish></finish>
+</execute_global_plan>
 
 -- END OF AGENT 2 --
 
@@ -526,7 +538,6 @@ Phase 2 has been sucessfully completed. Let's proceed to update the global plan 
 
 USER: The user message is: "Now kill the server, make it display the numbers in a table format."
 This is the global plan:
-
 {
     "Phase 1": {
         "reason": "The server needs to be stopped before modifying the Python code.",
@@ -577,6 +588,9 @@ The server is running on port 5000 with PID 126. You can access the list of numb
 
 Phase 3 has been sucessfully completed. Let's proceed to update the global plan based on the completion of this phase:
 
+<execute_global_plan>
+USER: The user message is: "Now kill the server, make it display the numbers in a table format."
+This is the global plan:
 <phase_transition>
 {
     "Phase 1": {
@@ -604,6 +618,7 @@ Phase 3 has been sucessfully completed. Let's proceed to update the global plan 
     }
 }
 </phase_transition>
+</execute_global_plan>
 <finish></finish>
 
 -- END OF AGENT 3 --
