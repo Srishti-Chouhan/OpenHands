@@ -17,7 +17,7 @@ class GlobalPlannerAgent(CodeActAgent):
         super().__init__(llm, config)
 
         self.action_parser = PlannerResponseParser(
-            initial_task_str=self.initial_task_str
+            initial_task_str=self.initial_user_message
         )
 
         # Planner agent can do everything except file-editing operations
@@ -48,4 +48,4 @@ class GlobalPlannerAgent(CodeActAgent):
             micro_agent=self.micro_agent,
         )
 
-        self.stop_sequences.append('</execute_global_plan>')
+        self.params['stop'].append('</execute_global_plan>')
