@@ -47,6 +47,7 @@ class PlannerResponseParser(CodeActResponseParser):
             'ipython',
             'browse',
             'global_plan',
+            'phase_plan',
             'decide',
             'revise',
             'overrule',
@@ -100,6 +101,7 @@ class CoActActionParserGlobalPlan(ActionParser):
             },
             action_suffix='global_plan',
         )
+        # 'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{global_plan_actions}\n\nYour task is to execute the following phase:\nPhase 1: {global_plan_json['Phase 1']}'
 
 
 # give a class for executing next agent using the CoActActionParserGlobalPlan pattern
@@ -114,6 +116,9 @@ class CoActActionParserPhasePlan(ActionParser):
     ):
         self.phase_plan: re.Match | None = None
         self.initial_task_str = initial_task_str or ['']
+        print(
+            '\n\n--------------------------------------\nhey from init\n--------------------------------------\n\n'
+        )
 
     def check_condition(self, action_str: str) -> bool:
         self.phase_plan = re.search(
@@ -158,7 +163,7 @@ class CoActActionParserPhasePlan(ActionParser):
             agent='CoActExecutorAgent',
             thought=thought,
             inputs={
-                'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{phase_plan_actions}\nYour task is to execute:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
+                'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{phase_plan_actions}\n\nYour task is to execute the following phase:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
             },
             action_suffix='phase_plan',
         )
