@@ -127,6 +127,9 @@ class CodeActAgent(Agent):
 
         self.pending_actions: deque[Action] = deque()
 
+        self.params: dict = {}
+        self.params['stop'] = []
+
     def get_action_message(
         self,
         action: Action,
@@ -330,18 +333,19 @@ class CodeActAgent(Agent):
 
         # prepare what we want to send to the LLM
         messages = self._get_messages(state)
-        self.params: dict = {
-            'messages': self.llm.format_messages_for_llm(messages),
-        }
+        self.params['messages'] = self.llm.format_messages_for_llm(messages)
+
         if self.function_calling_active:
             self.params['tools'] = self.tools
         else:
-            self.params['stop'] = [
-                '</execute_ipython>',
-                '</execute_bash>',
-                '</execute_browse>',
-                '</file_edit>',
-            ]
+            self.params['stop'].extend(
+                [
+                    '</execute_ipython>',
+                    '</execute_bash>',
+                    '</execute_browse>',
+                    '</file_edit>',
+                ]
+            )
         response = self.llm.completion(**self.params)
 
         if self.function_calling_active:
