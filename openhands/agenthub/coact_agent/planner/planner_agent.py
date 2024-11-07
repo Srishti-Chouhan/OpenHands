@@ -49,3 +49,7 @@ class GlobalPlannerAgent(CodeActAgent):
         )
 
         self.params['stop'].append('</execute_global_plan>')
+
+        print(
+            '\n\n--------------------------------------\nhey from GlobalPlannerAgent init\n--------------------------------------\n\n'
+        )
