@@ -1,5 +1,4 @@
 import asyncio
-import io
 import os
 import re
 import tempfile
@@ -27,6 +26,7 @@ with warnings.catch_warnings():
 
 from dotenv import load_dotenv
 from fastapi import (
+    BackgroundTasks,
     FastAPI,
     HTTPException,
     Request,
@@ -34,7 +34,7 @@ from fastapi import (
     WebSocket,
     status,
 )
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.security import HTTPBearer
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -329,12 +329,11 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.send_json({'error': 'Invalid token', 'error_code': 401})
             await websocket.close()
             return
-        logger.info(f'Existing session: {sid}')
     else:
         sid = str(uuid.uuid4())
         jwt_token = sign_token({'sid': sid}, config.jwt_secret)
-        logger.info(f'New session: {sid}')
 
+    logger.info(f'New session: {sid}')
     session = session_manager.add_or_restart_session(sid, websocket)
     await websocket.send_json({'token': jwt_token, 'status': 'ok'})
 
@@ -791,19 +790,20 @@ async def security_api(request: Request):
 
 
 @app.get('/api/zip-directory')
-async def zip_current_workspace(request: Request):
+async def zip_current_workspace(request: Request, background_tasks: BackgroundTasks):
     try:
         logger.debug('Zipping workspace')
         runtime: Runtime = request.state.conversation.runtime
-
         path = runtime.config.workspace_mount_path_in_sandbox
-        zip_file_bytes = await call_sync_from_async(runtime.copy_from, path)
-        zip_stream = io.BytesIO(zip_file_bytes)  # Wrap to behave like a file stream
-        response = StreamingResponse(
-            zip_stream,
+        zip_file = await call_sync_from_async(runtime.copy_from, path)
+        response = FileResponse(
+            path=zip_file,
+            filename='workspace.zip',
             media_type='application/x-zip-compressed',
-            headers={'Content-Disposition': 'attachment; filename=workspace.zip'},
         )
+
+        # This will execute after the response is sent (So the file is not deleted before being sent)
+        background_tasks.add_task(zip_file.unlink)
 
         return response
     except Exception as e:
