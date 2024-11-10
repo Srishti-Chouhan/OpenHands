@@ -16,6 +16,12 @@ class GlobalPlannerAgent(CodeActAgent):
     def __init__(self, llm: LLM, config: AgentConfig) -> None:
         super().__init__(llm, config)
 
+        # messages = [{"role": "user", "content": "build a calculator app"}]
+        self.function_calling_active = False
+        # self.action_parser = PlannerResponseParser(
+        #     initial_task_str=messages[0]
+        # )
+
         self.action_parser = PlannerResponseParser(
             initial_task_str=self.initial_user_message
         )
@@ -47,9 +53,7 @@ class GlobalPlannerAgent(CodeActAgent):
             },
             micro_agent=self.micro_agent,
         )
+        self.system_prompt = self.prompt_manager.system_message
+        self.initial_user_message = self.prompt_manager.initial_user_message
 
         self.params['stop'].append('</execute_global_plan>')
-
-        print(
-            '\n\n--------------------------------------\nhey from GlobalPlannerAgent init\n--------------------------------------\n\n'
-        )

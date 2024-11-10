@@ -90,9 +90,6 @@ class CoActActionParserPhaseTransition(ActionParser):
         self.request = None
         # Initialize an instance of CoActActionParserPhasePlan
         self.phase_plan_parser = CoActActionParserPhasePlan()
-        print(
-            '\n\n--------------------------------------\nhey from CoActActionParserPhaseTransition init\n--------------------------------------\n\n'
-        )
 
     def check_condition(self, action_str: str) -> bool:
         self.request = re.search(

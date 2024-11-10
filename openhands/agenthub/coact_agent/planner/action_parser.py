@@ -72,9 +72,6 @@ class CoActActionParserGlobalPlan(ActionParser):
     ):
         self.global_plan: re.Match | None = None
         self.initial_task_str = initial_task_str or ['']
-        print(
-            '\n\n--------------------------------------\nhey from CoActActionParserGlobalPlan init\n--------------------------------------\n\n'
-        )
 
     def check_condition(self, action_str: str) -> bool:
         self.global_plan = re.search(
@@ -119,9 +116,6 @@ class CoActActionParserPhasePlan(ActionParser):
     ):
         self.phase_plan: re.Match | None = None
         self.initial_task_str = initial_task_str or ['']
-        print(
-            '\n\n--------------------------------------\nhey from CoActActionParserPhasePlan init\n--------------------------------------\n\n'
-        )
 
     def check_condition(self, action_str: str) -> bool:
         self.phase_plan = re.search(
