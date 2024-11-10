@@ -16,14 +16,10 @@ class GlobalPlannerAgent(CodeActAgent):
     def __init__(self, llm: LLM, config: AgentConfig) -> None:
         super().__init__(llm, config)
 
-        # messages = [{"role": "user", "content": "build a calculator app"}]
         self.function_calling_active = False
-        # self.action_parser = PlannerResponseParser(
-        #     initial_task_str=messages[0]
-        # )
 
         self.action_parser = PlannerResponseParser(
-            initial_task_str=self.initial_user_message
+            initial_task_str='build a calculator app'
         )
 
         # Planner agent can do everything except file-editing operations
@@ -43,7 +39,19 @@ class GlobalPlannerAgent(CodeActAgent):
             for k, v in AGENTSKILLS_DOCS_DICT.items()
             if k in planner_agentskills_exclude
         ]
+        # self.prompt_manager = PromptManager(
+        #     prompt_dir=os.path.join(os.path.dirname(__file__)),
+        #     agent_skills_docs=''.join(planner_agentskills),
+        #     system_extra_vars={
+        #         'executor_editing_agent_skills_docs': ''.join(
+        #             executor_editing_agentskills
+        #         )
+        #     },
+        #     micro_agent=self.micro_agent,
+        # )
+
         self.prompt_manager = PromptManager(
+            microagent_dir=os.path.join(os.path.dirname(__file__), 'micro'),
             prompt_dir=os.path.join(os.path.dirname(__file__)),
             agent_skills_docs=''.join(planner_agentskills),
             system_extra_vars={
@@ -51,9 +59,8 @@ class GlobalPlannerAgent(CodeActAgent):
                     executor_editing_agentskills
                 )
             },
-            micro_agent=self.micro_agent,
         )
-        self.system_prompt = self.prompt_manager.system_message
-        self.initial_user_message = self.prompt_manager.initial_user_message
+        # self.system_prompt = self.prompt_manager.system_message
+        # self.initial_user_message = self.prompt_manager.initial_user_message
 
         self.params['stop'].append('</execute_global_plan>')

@@ -18,6 +18,6 @@ class LocalExecutorAgent(CodeActAgent):
         self.prompt_manager = PromptManager(
             prompt_dir=os.path.join(os.path.dirname(__file__)),
             agent_skills_docs=AgentSkillsRequirement.documentation,
-            micro_agent=self.micro_agent,
+            microagent_dir=os.path.join(os.path.dirname(__file__), 'micro'),
         )
         self.params['stop'].append('</execute_request>')

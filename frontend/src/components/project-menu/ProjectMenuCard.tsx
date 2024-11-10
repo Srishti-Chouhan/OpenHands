@@ -12,6 +12,7 @@ import { ProjectMenuCardContextMenu } from "./project.menu-card-context-menu";
 import { ProjectMenuDetailsPlaceholder } from "./project-menu-details-placeholder";
 import { ProjectMenuDetails } from "./project-menu-details";
 import { downloadWorkspace } from "#/utils/download-workspace";
+import { LoadingSpinner } from "../modals/LoadingProject";
 
 interface ProjectMenuCardProps {
   isConnectedToGitHub: boolean;
@@ -32,6 +33,7 @@ export function ProjectMenuCard({
   const [contextMenuIsOpen, setContextMenuIsOpen] = React.useState(false);
   const [connectToGitHubModalOpen, setConnectToGitHubModalOpen] =
     React.useState(false);
+  const [working, setWorking] = React.useState(false);
 
   const toggleMenuVisibility = () => {
     setContextMenuIsOpen((prev) => !prev);
@@ -41,10 +43,7 @@ export function ProjectMenuCard({
     posthog.capture("push_to_github_button_clicked");
     const rawEvent = {
       content: `
-Let's push the code to GitHub.
-If we're currently on the openhands-workspace branch, please create a new branch with a descriptive name.
-Commit any changes and push them to the remote repository.
-Finally, open up a pull request using the GitHub API and the token in the GITHUB_TOKEN environment variable, then show me the URL of the pull request.
+Please push the changes to GitHub and open a pull request.
 `,
       imageUrls: [],
       timestamp: new Date().toISOString(),
@@ -63,7 +62,11 @@ Finally, open up a pull request using the GitHub API and the token in the GITHUB
   const handleDownloadWorkspace = () => {
     posthog.capture("download_workspace_button_clicked");
     try {
-      downloadWorkspace();
+      setWorking(true);
+      downloadWorkspace().then(
+        () => setWorking(false),
+        () => setWorking(false),
+      );
     } catch (error) {
       toast.error("Failed to download workspace");
     }
@@ -71,7 +74,7 @@ Finally, open up a pull request using the GitHub API and the token in the GITHUB
 
   return (
     <div className="px-4 py-[10px] w-[337px] rounded-xl border border-[#525252] flex justify-between items-center relative">
-      {contextMenuIsOpen && (
+      {!working && contextMenuIsOpen && (
         <ProjectMenuCardContextMenu
           isConnectedToGitHub={isConnectedToGitHub}
           onConnectToGitHub={() => setConnectToGitHubModalOpen(true)}
@@ -98,7 +101,11 @@ Finally, open up a pull request using the GitHub API and the token in the GITHUB
         onClick={toggleMenuVisibility}
         aria-label="Open project menu"
       >
-        <EllipsisH width={36} height={36} />
+        {working ? (
+          <LoadingSpinner size="small" />
+        ) : (
+          <EllipsisH width={36} height={36} />
+        )}
       </button>
       {connectToGitHubModalOpen && (
         <ModalBackdrop onClose={() => setConnectToGitHubModalOpen(false)}>
