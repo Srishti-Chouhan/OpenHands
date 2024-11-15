@@ -64,8 +64,6 @@ class CodeActAgent(Agent):
         JupyterRequirement(),
     ]
 
-    action_parser = CodeActResponseParser()
-
     def __init__(
         self,
         llm: LLM,
@@ -78,6 +76,8 @@ class CodeActAgent(Agent):
         """
         super().__init__(llm, config)
         self.reset()
+
+        self.action_parser = CodeActResponseParser()
 
         self.micro_agent = (
             MicroAgent(

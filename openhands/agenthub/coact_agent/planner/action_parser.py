@@ -35,6 +35,7 @@ class PlannerResponseParser(CodeActResponseParser):
             CodeActActionParserIPythonRunCell(),
             CodeActActionParserAgentDelegate(),
             CoActActionParserGlobalPlan(initial_task_str=initial_task_str),
+            CoActActionParserPhasePlan(initial_task_str=initial_task_str),
         ]
         self.default_parser = CodeActActionParserMessage()
 
@@ -116,9 +117,6 @@ class CoActActionParserPhasePlan(ActionParser):
     ):
         self.phase_plan: re.Match | None = None
         self.initial_task_str = initial_task_str or ['']
-        print(
-            '\n\n--------------------------------------\nhey from init\n--------------------------------------\n\n'
-        )
 
     def check_condition(self, action_str: str) -> bool:
         self.phase_plan = re.search(
