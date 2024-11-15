@@ -35,8 +35,8 @@ class ExecutorResponseParser(CodeActResponseParser):
             CodeActActionParserCmdRun(),
             CodeActActionParserIPythonRunCell(),
             CodeActActionParserAgentDelegate(),
-            CoActActionParserRequest(),
             CoActActionParserPhaseTransition(),
+            CoActActionParserRequest(),
         ]
         self.default_parser = CodeActActionParserMessage()
 
@@ -50,6 +50,7 @@ class ExecutorResponseParser(CodeActResponseParser):
             'browse',
             'request',
             'global_plan',
+            'phase_plan',
         ]:
             if (
                 f'<execute_{action_suffix}>' in action
@@ -81,10 +82,6 @@ class CoActActionParserRequest(ActionParser):
         )
 
 
-# we want to have a different agent for each phase
-# so run a loop over the global plan for each phase
-# and once the phase is done, the agent returns that it is done and returns the output
-# then the next agent is run for the next phase and so on
 class CoActActionParserPhaseTransition(ActionParser):
     def __init__(self):
         self.request = None
@@ -96,6 +93,9 @@ class CoActActionParserPhaseTransition(ActionParser):
             r'<execute_global_plan>(.*)</execute_global_plan>',
             action_str,
             re.DOTALL,
+        )
+        print(
+            f'\n\n----------------------\naction_str: {action_str}\n----------------------\n\n'
         )
         return self.request is not None
 

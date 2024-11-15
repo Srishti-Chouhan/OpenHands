@@ -70,6 +70,9 @@ class MicroAgent(Agent):
             delegates=self.delegates,
             latest_user_message=last_user_message,
         )
+        print(
+            f'\n\n----------------------\nPrompt: {prompt}\n----------------------\n\n'
+        )
         content = [TextContent(text=prompt)]
         if self.llm.vision_is_active() and last_image_urls:
             content.append(ImageContent(image_urls=last_image_urls))

@@ -50,9 +50,17 @@ class PromptManager:
         self.user_extra_vars = user_extra_vars or {}
         self.system_extra_vars = system_extra_vars or {}
 
+    def initial_user_message(self) -> str:
+        self.micro_agent = next(iter(self.microagents.values()), None)
+        rendered = self.user_template.render(
+            micro_agent=self.micro_agent.content if self.micro_agent else None,
+            **self.user_extra_vars,
+        )
+        return rendered.strip()
+
     def _load_template(self, template_name: str) -> Template:
         template_path = os.path.join(self.prompt_dir, f'{template_name}.j2')
-        print(f'\n\n-------------------\n\n{template_path}\n\n-------------------\n\n')
+        # print(f'\n\n-------------------\n\n{template_path}\n\n-------------------\n\n')
         if not os.path.exists(template_path):
             raise FileNotFoundError(f'Prompt file {template_path} not found')
         with open(template_path, 'r') as file:
@@ -86,6 +94,7 @@ class PromptManager:
         if not message.content:
             return
         message_content = message.content[0].text
+        self.message_content = message_content
         for microagent in self.microagents.values():
             trigger = microagent.get_trigger(message_content)
             if trigger:

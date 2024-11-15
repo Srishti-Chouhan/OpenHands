@@ -74,6 +74,7 @@ class CoActActionParserGlobalPlan(ActionParser):
         self.initial_task_str = initial_task_str or ['']
 
     def check_condition(self, action_str: str) -> bool:
+        # print(f'\n\n----------------------\naction_str: {action_str}\n----------------------\n\n')
         self.global_plan = re.search(
             r'<execute_global_plan>(.*)</execute_global_plan>', action_str, re.DOTALL
         )
@@ -86,6 +87,15 @@ class CoActActionParserGlobalPlan(ActionParser):
         thought = action_str.replace(self.global_plan.group(0), '').strip()
         global_plan_actions = self.global_plan.group(1).strip()
 
+        # print(f'\n\n----------------------\nthought: {thought}\n----------------------\n\n')
+        # print(f'\n\n----------------------\nglobal_plan_actions: {global_plan_actions}\n----------------------\n\n')
+
+        start_index = thought.find('to')
+        end_index = thought.find(':')
+        self.user_message = thought[start_index:end_index].strip()
+
+        # print(f'\n\n----------------------\nuser_message: {self.user_message}\n----------------------\n\n')
+        # print(f'\n\n----------------------\nmessage content: {self.message_content}\n----------------------\n\n')
         # Some extra processing when doing swe-bench eval: extract text up to and including '--- END ISSUE ---'
         issue_text_pattern = re.compile(r'(.*--- END ISSUE ---)', re.DOTALL)
         issue_text_match = issue_text_pattern.match(self.initial_task_str[0])
@@ -93,11 +103,22 @@ class CoActActionParserGlobalPlan(ActionParser):
         if issue_text_match:
             self.initial_task_str[0] = issue_text_match.group(1)
 
+        # return AgentDelegateAction(
+        #     agent='CoActExecutorAgent',
+        #     thought=thought,
+        #     inputs={
+        #         'task': f'The user message is: {self.initial_task_str[0]}.\nExecute the following plan to fulfill it:\n{global_plan_actions}'
+        #     },
+        #     action_suffix='global_plan',
+        # )
+
+        global_plan_json = json.loads(global_plan_actions)
         return AgentDelegateAction(
             agent='CoActExecutorAgent',
             thought=thought,
             inputs={
-                'task': f'The user message is: {self.initial_task_str[0]}.\nExecute the following plan to fulfill it:\n{global_plan_actions}'
+                # 'task': f'The user message is: build a snake game\nExecute the following plan to fulfill it:\n{global_plan_actions}'
+                'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{global_plan_actions}\n\nYour task is to execute the following phase:\nPhase 1: {global_plan_json['Phase 1']}'
             },
             action_suffix='global_plan',
         )
@@ -156,11 +177,19 @@ class CoActActionParserPhasePlan(ActionParser):
                 outputs={'content': ''},
             )
 
+        # return AgentDelegateAction(
+        #     agent='CoActExecutorAgent',
+        #     thought=thought,
+        #     inputs={
+        #         'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{phase_plan_actions}\n\nYour task is to execute the following phase:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
+        #     },
+        #     action_suffix='phase_plan',
+        # )
         return AgentDelegateAction(
             agent='CoActExecutorAgent',
             thought=thought,
             inputs={
-                'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{phase_plan_actions}\n\nYour task is to execute the following phase:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
+                'task': f'The user message is: build a snake game.\nThis is the global plan:\n{phase_plan_actions}\n\nYour task is to execute the following phase:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
             },
             action_suffix='phase_plan',
         )

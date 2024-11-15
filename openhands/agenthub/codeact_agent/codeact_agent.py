@@ -310,25 +310,14 @@ class CodeActAgent(Agent):
         super().reset()
 
     def step(self, state: State) -> Action:
-        """Performs one step using the CodeAct Agent.
-        This includes gathering info on previous steps and prompting the model to make a command to execute.
-
-        Parameters:
-        - state (State): used to get updated info
-
-        Returns:
-        - CmdRunAction(command) - bash command to run
-        - IPythonRunCellAction(code) - IPython code to run
-        - AgentDelegateAction(agent, inputs) - delegate action for (sub)task
-        - MessageAction(content) - Message action to run (e.g. ask for clarification)
-        - AgentFinishAction() - end the interaction
-        """
         # Continue with pending actions if any
         if self.pending_actions:
             return self.pending_actions.popleft()
 
         # if we're done, go back
         latest_user_message = state.get_last_user_message()
+        self.latest_user_message = latest_user_message
+        # print(f'\n\n-------------------\nlatest_user_message: {latest_user_message}\n-------------------\n\n')
         if latest_user_message and latest_user_message.content.strip() == '/exit':
             return AgentFinishAction()
 
@@ -390,6 +379,9 @@ class CodeActAgent(Agent):
             - Messages from the same role are combined to prevent consecutive same-role messages
             - For Anthropic models, specific messages are cached according to their documentation
         """
+        self.initial_task_str = [state.get_last_user_message()]
+        # print(f'\n\n-------------------\ninitial_task_str updated : {self.initial_task_str}\n-------------------\n\n')
+        # print(f'\n\n-------------------\nstate: {vars(state)}\n-------------------\n\n')
         messages: list[Message] = [
             Message(
                 role='system',
@@ -459,6 +451,7 @@ class CodeActAgent(Agent):
                 if message:
                     if message.role == 'user':
                         self.prompt_manager.enhance_message(message)
+                        self.user_msg = self.prompt_manager.message_content
                     # handle error if the message is the SAME role as the previous message
                     # litellm.exceptions.BadRequestError: litellm.BadRequestError: OpenAIException - Error code: 400 - {'detail': 'Only supports u/a/u/a/u...'}
                     # there shouldn't be two consecutive messages from the same role

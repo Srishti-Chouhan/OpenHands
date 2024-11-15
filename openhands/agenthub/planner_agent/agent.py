@@ -45,6 +45,9 @@ class PlannerAgent(Agent):
         prompt, image_urls = get_prompt_and_images(
             state, self.llm.config.max_message_chars
         )
+        print(
+            f'\n\n----------------------\nPrompt from planner agent: {prompt}\n----------------------\n\n'
+        )
         content = [TextContent(text=prompt)]
         if self.llm.vision_is_active() and image_urls:
             content.append(ImageContent(image_urls=image_urls))

@@ -18,9 +18,7 @@ class GlobalPlannerAgent(CodeActAgent):
 
         self.function_calling_active = False
 
-        self.action_parser = PlannerResponseParser(
-            initial_task_str='build a calculator app'
-        )
+        self.action_parser = PlannerResponseParser()
 
         # Planner agent can do everything except file-editing operations
         planner_agentskills_exclude = [
@@ -39,16 +37,6 @@ class GlobalPlannerAgent(CodeActAgent):
             for k, v in AGENTSKILLS_DOCS_DICT.items()
             if k in planner_agentskills_exclude
         ]
-        # self.prompt_manager = PromptManager(
-        #     prompt_dir=os.path.join(os.path.dirname(__file__)),
-        #     agent_skills_docs=''.join(planner_agentskills),
-        #     system_extra_vars={
-        #         'executor_editing_agent_skills_docs': ''.join(
-        #             executor_editing_agentskills
-        #         )
-        #     },
-        #     micro_agent=self.micro_agent,
-        # )
 
         self.prompt_manager = PromptManager(
             microagent_dir=os.path.join(os.path.dirname(__file__), 'micro'),
