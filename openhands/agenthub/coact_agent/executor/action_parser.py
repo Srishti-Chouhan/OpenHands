@@ -1,4 +1,5 @@
 import re
+import traceback
 
 from openhands.agenthub.coact_agent.planner.action_parser import (
     CoActActionParserPhasePlan,
@@ -49,8 +50,7 @@ class ExecutorResponseParser(CodeActResponseParser):
             'ipython',
             'browse',
             'request',
-            'global_plan',
-            'phase_plan',
+            'phase_transition',
         ]:
             if (
                 f'<execute_{action_suffix}>' in action
@@ -94,9 +94,10 @@ class CoActActionParserPhaseTransition(ActionParser):
             action_str,
             re.DOTALL,
         )
-        print(
-            f'\n\n----------------------\naction_str: {action_str}\n----------------------\n\n'
-        )
+        print('\n\n----------------------\ncheck_condition called with action_str:\n')
+        # print(f'\n\n----------------------\naction_str: {action_str}\n----------------------\n\n')
+        traceback.print_stack()
+        print('\n----------------------\n\n')
         return self.request is not None
 
     def parse(self, action_str: str) -> Action:

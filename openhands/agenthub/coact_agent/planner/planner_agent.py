@@ -18,7 +18,9 @@ class GlobalPlannerAgent(CodeActAgent):
 
         self.function_calling_active = False
 
-        self.action_parser = PlannerResponseParser()
+        self.action_parser = PlannerResponseParser(
+            initial_task_str=['build a chess game']
+        )
 
         # Planner agent can do everything except file-editing operations
         planner_agentskills_exclude = [

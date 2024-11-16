@@ -47,9 +47,12 @@ class PromptManager:
             microagent = MicroAgent(microagent_file)
             self.microagents[microagent.name] = microagent
 
+        # print(f'\n\n-------------------\nmicroagents: {self.microagents}\n-------------------\n\n')
+
         self.user_extra_vars = user_extra_vars or {}
         self.system_extra_vars = system_extra_vars or {}
 
+    @property
     def initial_user_message(self) -> str:
         self.micro_agent = next(iter(self.microagents.values()), None)
         rendered = self.user_template.render(
@@ -66,6 +69,7 @@ class PromptManager:
         with open(template_path, 'r') as file:
             return Template(file.read())
 
+    # @property
     def get_system_message(self) -> str:
         rendered = self.system_template.render(
             agent_skills_docs=self.agent_skills_docs,

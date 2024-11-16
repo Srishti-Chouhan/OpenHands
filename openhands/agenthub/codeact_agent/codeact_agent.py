@@ -84,7 +84,8 @@ class CodeActAgent(Agent):
         super().__init__(llm, config)
         self.reset()
 
-        self.function_calling_active = self.config.function_calling
+        # self.function_calling_active = self.config.function_calling
+        self.function_calling_active = False
         if self.function_calling_active and not self.llm.is_function_calling_active():
             logger.warning(
                 f'Function calling not supported for model {self.llm.config.model}. '
@@ -119,6 +120,19 @@ class CodeActAgent(Agent):
 
         self.params: dict = {}
         self.params['stop'] = []
+
+        # if not self.function_calling_active:
+
+        # self.params['stop'].extend(
+        #     [
+        #         '</execute_ipython>',
+        #         '</execute_bash>',
+        #         '</execute_browse>',
+        #         # '</file_edit>',
+        #     ]
+        # )
+
+        self.initial_task_str = ['']
 
     def get_action_message(
         self,
@@ -334,9 +348,10 @@ class CodeActAgent(Agent):
                     '</execute_ipython>',
                     '</execute_bash>',
                     '</execute_browse>',
-                    '</file_edit>',
+                    # '</file_edit>',
                 ]
             )
+            self.params['temperature'] = 0.0
         response = self.llm.completion(**self.params)
 
         if self.function_calling_active:
@@ -379,9 +394,21 @@ class CodeActAgent(Agent):
             - Messages from the same role are combined to prevent consecutive same-role messages
             - For Anthropic models, specific messages are cached according to their documentation
         """
-        self.initial_task_str = [state.get_last_user_message()]
+        # self.initial_task_str = [state.get_last_user_message()]
         # print(f'\n\n-------------------\ninitial_task_str updated : {self.initial_task_str}\n-------------------\n\n')
-        # print(f'\n\n-------------------\nstate: {vars(state)}\n-------------------\n\n')
+        # print(f'\n\n-------------------\nstate: {dir(state)}\n-------------------\n\n')
+        # print(f'\n\n-------------------\nstate: {state}\n-------------------\n\n')
+
+        # delegated_task = ''
+        # if state.history != []:
+        # CodeActAgent is delegated a task
+        # delegated_task = '\n' + state.history[0].message
+        # print(f'\n\n-------------------\ndelegated_task : {delegated_task}\n-------------------\n\n')
+        # self.initial_task_str.append([state.history[0].message])
+
+        # print(f'\n\n-------------------\ninitial_task_str updated : {self.initial_task_str}\n-------------------\n\n')
+        # print(f'\n\n-------------------\ndelegated_task : {delegated_task}\n-------------------\n\n')
+
         messages: list[Message] = [
             Message(
                 role='system',
@@ -398,8 +425,12 @@ class CodeActAgent(Agent):
             messages.append(
                 Message(
                     role='user',
-                    content=[TextContent(text=example_message)],
-                    cache_prompt=self.llm.is_caching_prompt_active(),
+                    content=[
+                        TextContent(
+                            text=example_message,
+                            cache_prompt=self.llm.is_caching_prompt_active(),
+                        )
+                    ],
                 )
             )
 
@@ -451,7 +482,7 @@ class CodeActAgent(Agent):
                 if message:
                     if message.role == 'user':
                         self.prompt_manager.enhance_message(message)
-                        self.user_msg = self.prompt_manager.message_content
+
                     # handle error if the message is the SAME role as the previous message
                     # litellm.exceptions.BadRequestError: litellm.BadRequestError: OpenAIException - Error code: 400 - {'detail': 'Only supports u/a/u/a/u...'}
                     # there shouldn't be two consecutive messages from the same role

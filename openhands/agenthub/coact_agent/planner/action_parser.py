@@ -119,6 +119,7 @@ class CoActActionParserGlobalPlan(ActionParser):
             inputs={
                 # 'task': f'The user message is: build a snake game\nExecute the following plan to fulfill it:\n{global_plan_actions}'
                 'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{global_plan_actions}\n\nYour task is to execute the following phase:\nPhase 1: {global_plan_json['Phase 1']}'
+                # 'task': f'This is the global plan:\n{global_plan_actions}\n\nYour task is to execute the following phase:\nPhase 1: {global_plan_json['Phase 1']}',
             },
             action_suffix='global_plan',
         )
@@ -189,7 +190,7 @@ class CoActActionParserPhasePlan(ActionParser):
             agent='CoActExecutorAgent',
             thought=thought,
             inputs={
-                'task': f'The user message is: build a snake game.\nThis is the global plan:\n{phase_plan_actions}\n\nYour task is to execute the following phase:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
+                'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{phase_plan_actions}\n\nYour task is to execute the following phase:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
             },
             action_suffix='phase_plan',
         )
