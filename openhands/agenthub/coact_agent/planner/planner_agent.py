@@ -4,6 +4,8 @@ from openhands.agenthub.coact_agent.planner.action_parser import PlannerResponse
 from openhands.agenthub.codeact_agent.codeact_agent import CodeActAgent
 from openhands.core.config import AgentConfig
 from openhands.llm.llm import LLM
+
+# from openhands.core.config.llm_config import LLMConfig
 from openhands.runtime.plugins.agent_skills.agentskills import (
     DOCUMENTATION_DICT as AGENTSKILLS_DOCS_DICT,
 )
@@ -14,6 +16,9 @@ class GlobalPlannerAgent(CodeActAgent):
     VERSION = '1.0'
 
     def __init__(self, llm: LLM, config: AgentConfig) -> None:
+        llm.config.model = 'gpt-4o'
+        # print(f"\n\nLLM Config Attributes:", vars(llm.config), "\n\n")
+
         super().__init__(llm, config)
 
         self.action_parser = PlannerResponseParser(

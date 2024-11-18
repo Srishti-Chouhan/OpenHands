@@ -35,7 +35,7 @@ class PlannerResponseParser(CodeActResponseParser):
             CodeActActionParserIPythonRunCell(),
             CodeActActionParserAgentDelegate(),
             CoActActionParserGlobalPlan(initial_task_str=initial_task_str),
-            CoActActionParserPhasePlan(initial_task_str=initial_task_str),
+            # CoActActionParserPhasePlan(initial_task_str=initial_task_str),
         ]
         self.default_parser = CodeActActionParserMessage()
 
@@ -48,7 +48,7 @@ class PlannerResponseParser(CodeActResponseParser):
             'ipython',
             'browse',
             'global_plan',
-            'phase_plan',
+            'phase_transition',
             'decide',
             'revise',
             'overrule',
