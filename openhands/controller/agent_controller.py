@@ -619,6 +619,9 @@ class AgentController:
         """
         # check if delegate stuck
         if self.delegate and self.delegate._is_stuck():
+            print(
+                f'\n\n####################self.delegate._is_stuck: {self.delegate._is_stuck()}\n####################\n\n'
+            )
             return True
 
         return self._stuck_detector.is_stuck()

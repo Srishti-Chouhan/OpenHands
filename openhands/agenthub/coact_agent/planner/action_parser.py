@@ -4,6 +4,7 @@ import re
 from openhands.agenthub.codeact_agent.action_parser import (
     CodeActActionParserAgentDelegate,
     CodeActActionParserCmdRun,
+    CodeActActionParserFileEdit,
     CodeActActionParserFinish,
     CodeActActionParserIPythonRunCell,
     CodeActActionParserMessage,
@@ -31,11 +32,12 @@ class PlannerResponseParser(CodeActResponseParser):
         super().__init__()
         self.action_parsers = [
             CodeActActionParserFinish(),
+            CodeActActionParserFileEdit(),
             CodeActActionParserCmdRun(),
             CodeActActionParserIPythonRunCell(),
             CodeActActionParserAgentDelegate(),
             CoActActionParserGlobalPlan(initial_task_str=initial_task_str),
-            # CoActActionParserPhasePlan(initial_task_str=initial_task_str),
+            CoActActionParserPhasePlan(initial_task_str=initial_task_str),
         ]
         self.default_parser = CodeActActionParserMessage()
 
@@ -94,15 +96,24 @@ class CoActActionParserGlobalPlan(ActionParser):
         if issue_text_match:
             self.initial_task_str[0] = issue_text_match.group(1)
 
+        # return AgentDelegateAction(
+        #     agent='CoActExecutorAgent',
+        #     thought=thought,
+        #     inputs={
+        #         'task': f'{thought}.\nExecute the following plan to fulfill it:\n{global_plan_actions}'
+        #     },
+        #     action_suffix='global_plan',
+        # )
+        # 'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{global_plan_actions}\n\nYour task is to execute the following phase:\nPhase 1: {global_plan_json['Phase 1']}'
+
         return AgentDelegateAction(
             agent='CoActExecutorAgent',
             thought=thought,
             inputs={
-                'task': f'The user message is: {self.initial_task_str[0]}.\nExecute the following plan to fulfill it:\n{global_plan_actions}'
+                'task': f'{self.initial_task_str[0]}.\nExecute the following plan to fulfill it:\n{global_plan_actions}'
             },
-            action_suffix='global_plan',
+            action_suffix='',
         )
-        # 'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{global_plan_actions}\n\nYour task is to execute the following phase:\nPhase 1: {global_plan_json['Phase 1']}'
 
 
 # give a class for executing next agent using the CoActActionParserGlobalPlan pattern
@@ -157,11 +168,19 @@ class CoActActionParserPhasePlan(ActionParser):
                 outputs={'content': ''},
             )
 
+        # return AgentDelegateAction(
+        #     agent='CoActExecutorAgent',
+        #     thought=thought,
+        #     inputs={
+        #         'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{phase_plan_actions}\n\nYour task is to execute the following phase:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
+        #     },
+        #     action_suffix='phase_plan',
+        # )
         return AgentDelegateAction(
             agent='CoActExecutorAgent',
             thought=thought,
             inputs={
-                'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{phase_plan_actions}\n\nYour task is to execute the following phase:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
+                'task': f'{self.initial_task_str[0]}.\nThis is the global plan:\n{phase_plan_actions}\n\nYour task is to execute the following phase:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
             },
-            action_suffix='phase_plan',
+            action_suffix='',
         )

@@ -16,7 +16,8 @@ class GlobalPlannerAgent(CodeActAgent):
     VERSION = '1.0'
 
     def __init__(self, llm: LLM, config: AgentConfig) -> None:
-        llm.config.model = 'gpt-4o'
+        # llm.config.model = 'openai/neulab/gpt-4o-2024-08-06'
+        # llm.config.model = 'openai/neulab/o1-preview'
         # print(f"\n\nLLM Config Attributes:", vars(llm.config), "\n\n")
 
         super().__init__(llm, config)

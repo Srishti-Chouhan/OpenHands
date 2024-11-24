@@ -13,7 +13,7 @@ The structure of the global plan should be as follows:
         "reason": "<<Assistant's thorough thoughts on why this phase is necessary. The planner can add some tips/codes to instruct the executor finish the task easier.>>",
         "description": "<<Describe what needs to be done in this phase.>>",
         "expected_state": "<<Describe the expected state after this phase is completed. If the task involves code editing, provide the expectation of the code after the edit.>>",
-        "file_path": "<<Optional - Provide the file path here. This can be the file that was created in the phase. In one phase only 1 file is edited.>>",
+        "file_path": "<<Optional - Provide the file path here. In one phase only 1 file is edited.>>",
         "expected_content": "<<Optional - Provide the expected content here WITH LINE NUMBERS and a vertical bar before the actual code e.g., 1|, 11|,. Only use partial content to avoid repetition.>>"
         "status": "<<Provide the status of the phase. Default to `assigned` when phase is defined. If the phase is successfully completed, mark it as `done`. If the phase fails, mark it as `error encountered`>>",
         "feedback": "<<Provide feedback on the phase. Default to `in progress`. If the phase is completed, provide feedback on the completion and summarize the process. If the phase fails, provide a summary of the error encountered and suggest guidance to the global planner agent.>>",
@@ -46,7 +46,7 @@ or it can contain the text `ctrl+c` to interrupt the process.
 
 For commands that may run indefinitely, the output should be redirected to a file and the command run
 in the background, e.g. <execute_bash> python3 app.py > server.log 2>&1 & </execute_bash>
-If a command execution result says "Command timed out. Sending SIGINT to the process", the agent should retry running the command in the background.
+If a command execution result says "Command timed out. Sending SIGINT to the process", the assistant should retry running the command in the background.
 
 [3] The assistant can edit files using <file_edit> by setting the file path and providing a draft of the new file content. The draft file content does not need to be exactly the same as the existing file content; the assistant may skip some lines and only include the parts that need to be changed.
 
@@ -179,7 +179,7 @@ Or <execute_browse> Tell me what is in http://example.com </execute_browse>.
 {% set PIP_INSTALL_PREFIX %}
 The agent can install Python packages using the %pip magic command in an IPython environment by using the following syntax: <execute_ipython> %pip install [package needed] </execute_ipython> and should always import packages and define variables before starting to use them.
 {% endset %}
-{% set SYSTEM_PREFIX = MINIMAL_SYSTEM_PREFIX + BROWSING_PREFIX + PIP_INSTALL_PREFIX %}
+{% set SYSTEM_PREFIX = MINIMAL_SYSTEM_PREFIX + PIP_INSTALL_PREFIX %}
 {% set COMMAND_DOCS %}
 Apart from the standard Python library, the agent can also use the following functions (already imported) in <execute_ipython> environment:
 {{ planner_agent_skills_docs }}

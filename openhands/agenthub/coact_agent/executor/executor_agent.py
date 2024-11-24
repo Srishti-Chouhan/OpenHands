@@ -12,6 +12,7 @@ class LocalExecutorAgent(CodeActAgent):
     VERSION = '1.0'
 
     def __init__(self, llm: LLM, config: AgentConfig) -> None:
+        # llm.config.model = 'openai/neulab/claude-3-5-sonnet-20241022'
         super().__init__(llm, config)
 
         self.action_parser = ExecutorResponseParser()

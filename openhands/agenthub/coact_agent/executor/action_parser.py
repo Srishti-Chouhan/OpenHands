@@ -6,6 +6,7 @@ from openhands.agenthub.coact_agent.planner.action_parser import (
 from openhands.agenthub.codeact_agent.action_parser import (
     CodeActActionParserAgentDelegate,
     CodeActActionParserCmdRun,
+    CodeActActionParserFileEdit,
     CodeActActionParserFinish,
     CodeActActionParserIPythonRunCell,
     CodeActActionParserMessage,
@@ -32,30 +33,31 @@ class ExecutorResponseParser(CodeActResponseParser):
         super().__init__()
         self.action_parsers = [
             CodeActActionParserFinish(),
+            CodeActActionParserFileEdit(),
             CodeActActionParserCmdRun(),
             CodeActActionParserIPythonRunCell(),
             CodeActActionParserAgentDelegate(),
             CoActActionParserRequest(),
-            # CoActActionParserPhaseTransition(),
+            CoActActionParserPhaseTransition(),
         ]
         self.default_parser = CodeActActionParserMessage()
 
-    def parse_response(self, response) -> str:
-        action = response.choices[0].message.content
-        if action is None:
-            return ''
-        for action_suffix in [
-            'bash',
-            'ipython',
-            'browse',
-            'request',
-        ]:
-            if (
-                f'<execute_{action_suffix}>' in action
-                and f'</execute_{action_suffix}>' not in action
-            ):
-                action += f'</execute_{action_suffix}>'
-        return action
+    # def parse_response(self, response) -> str:
+    #     action = response.choices[0].message.content
+    #     if action is None:
+    #         return ''
+    #     for action_suffix in [
+    #         'bash',
+    #         'ipython',
+    #         'browse',
+    #         'request',
+    #     ]:
+    #         if (
+    #             f'<execute_{action_suffix}>' in action
+    #             and f'</execute_{action_suffix}>' not in action
+    #         ):
+    #             action += f'</execute_{action_suffix}>'
+    #     return action
 
 
 class CoActActionParserRequest(ActionParser):
@@ -100,6 +102,8 @@ class CoActActionParserPhaseTransition(ActionParser):
         ), 'self.request should not be None when parse is called'
 
         phase_transition_request = self.request.group(1).strip()
+
+        # print(f'###################\nphase transition request: {phase_transition_request}\n###################\n\n')
 
         # Use the phase_plan_parser to parse the phase plan action
         if self.phase_plan_parser.check_condition(phase_transition_request):

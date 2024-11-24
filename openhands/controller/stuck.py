@@ -58,20 +58,33 @@ class StuckDetector:
 
         # scenario 1: same action, same observation
         if self._is_stuck_repeating_action_observation(last_actions, last_observations):
+            print(
+                '\n\n#################\nI am stuck in the same action, same observation loop\n#################\n\n'
+            )
             return True
 
         # scenario 2: same action, errors
         if self._is_stuck_repeating_action_error(last_actions, last_observations):
+            print(
+                '\n\n#################\nI am stuck in the same action, error loop\n############################\n\n'
+            )
             return True
 
         # scenario 3: monologue
         if self._is_stuck_monologue(filtered_history):
+            print(
+                '\n\n#################\nI am stuck in a monologue\n#################\n\n'
+            )
             return True
 
         # scenario 4: action, observation pattern on the last six steps
         if len(filtered_history) < 6:
+            # print(f'\n\n#################\nI am not stuck yet\n#################\n\n')
             return False
         if self._is_stuck_action_observation_pattern(filtered_history):
+            print(
+                '\n\n#################\nI am stuck in an action, observation pattern\n#################\n\n'
+            )
             return True
 
         return False
@@ -128,6 +141,8 @@ class StuckDetector:
 
         if len(last_actions) < 4 or len(last_observations) < 4:
             return False
+
+        # print(f'\n\n#################\nChecking {last_actions[:3]}\n#################\n\n')
 
         # are the last three actions the "same"?
         if all(self._eq_no_pid(last_actions[0], action) for action in last_actions[:3]):
