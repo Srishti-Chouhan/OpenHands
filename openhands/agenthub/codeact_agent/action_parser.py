@@ -106,7 +106,7 @@ class CodeActActionParserFinish(ActionParser):
             self.finish_command is not None
         ), 'self.finish_command should not be None when parse is called'
         thought = action_str.replace(self.finish_command.group(0), '').strip()
-        return AgentFinishAction(thought=thought)
+        return AgentFinishAction(thought=thought, outputs={'content': thought})
 
 
 class CodeActActionParserCmdRun(ActionParser):
@@ -134,7 +134,8 @@ class CodeActActionParserCmdRun(ActionParser):
         # a command was found
         command_group = self.bash_command.group(1).strip()
         if command_group.strip() == 'exit':
-            return AgentFinishAction(thought=thought)
+            # return AgentFinishAction(thought=thought)
+            return AgentFinishAction(thought=thought, outputs={'content': thought})
         return CmdRunAction(command=command_group, thought=thought)
 
 

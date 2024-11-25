@@ -84,6 +84,8 @@ class CodeActAgent(Agent):
         super().__init__(llm, config)
         self.reset()
 
+        self.action_parser = CodeActResponseParser()
+
         self.micro_agent = (
             MicroAgent(
                 os.path.join(
@@ -126,6 +128,11 @@ class CodeActAgent(Agent):
             self.initial_user_message = self.prompt_manager.initial_user_message
 
         self.pending_actions: deque[Action] = deque()
+
+        self.params: dict = {}
+
+        if not self.function_calling_active:
+            self.params['stop'] = []
 
     def get_action_message(
         self,
@@ -330,19 +337,27 @@ class CodeActAgent(Agent):
 
         # prepare what we want to send to the LLM
         messages = self._get_messages(state)
-        params: dict = {
-            'messages': self.llm.format_messages_for_llm(messages),
-        }
+        # params = {
+        #     'messages': self.llm.format_messages_for_llm(messages),
+        # }
+
+        self.params.update(
+            {
+                'messages': self.llm.format_messages_for_llm(messages),
+            }
+        )
         if self.function_calling_active:
-            params['tools'] = self.tools
+            self.params['tools'] = self.tools
         else:
-            params['stop'] = [
-                '</execute_ipython>',
-                '</execute_bash>',
-                '</execute_browse>',
-                '</file_edit>',
-            ]
-        response = self.llm.completion(**params)
+            self.params['stop'].extend(
+                [
+                    '</execute_ipython>',
+                    '</execute_bash>',
+                    '</execute_browse>',
+                    '</file_edit>',
+                ]
+            )
+        response = self.llm.completion(**self.params)
 
         if self.function_calling_active:
             actions = codeact_function_calling.response_to_actions(response)
