@@ -26,7 +26,11 @@ class GlobalPlannerAgent(CodeActAgent):
         #     initial_task_str=self.initial_task_str
         # )
 
-        self.action_parser = PlannerResponseParser()
+        self.function_calling_active = False
+
+        self.action_parser = PlannerResponseParser(
+            initial_task_str=self.initial_task_str
+        )
 
         # Planner agent can do everything except file-editing operations
         planner_agentskills_exclude = [
@@ -56,4 +60,6 @@ class GlobalPlannerAgent(CodeActAgent):
             micro_agent=self.micro_agent,
         )
 
+        self.system_prompt = self.prompt_manager.system_message
+        self.initial_user_message = self.prompt_manager.initial_user_message
         self.params['stop'].append('</execute_global_plan>')

@@ -36,8 +36,8 @@ class PlannerResponseParser(CodeActResponseParser):
             CodeActActionParserCmdRun(),
             CodeActActionParserIPythonRunCell(),
             CodeActActionParserAgentDelegate(),
-            CoActActionParserGlobalPlan(initial_task_str=initial_task_str),
-            CoActActionParserPhasePlan(initial_task_str=initial_task_str),
+            CoActActionParserGlobalPlan(),
+            CoActActionParserPhasePlan(),
         ]
         self.default_parser = CodeActActionParserMessage()
 
@@ -106,13 +106,20 @@ class CoActActionParserGlobalPlan(ActionParser):
         # )
         # 'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{global_plan_actions}\n\nYour task is to execute the following phase:\nPhase 1: {global_plan_json['Phase 1']}'
 
+        # self.messages.append(
+        #         Message(
+        #             role='user',
+        #             content=[TextContent(text=' Execute the global plan given by the planner agent to fulfill the user task')],
+        #         )
+        #     )
+
         return AgentDelegateAction(
             agent='CoActExecutorAgent',
             thought=thought,
             inputs={
                 'task': f'{self.initial_task_str[0]}.\nExecute the following plan to fulfill it:\n{global_plan_actions}'
             },
-            action_suffix='',
+            action_suffix='global_plan',
         )
 
 
@@ -176,11 +183,13 @@ class CoActActionParserPhasePlan(ActionParser):
         #     },
         #     action_suffix='phase_plan',
         # )
+
+        # print(f'\n\n################\nphase_plan_actions: {phase_plan_actions}\n###############\n\n')
         return AgentDelegateAction(
             agent='CoActExecutorAgent',
             thought=thought,
             inputs={
-                'task': f'{self.initial_task_str[0]}.\nThis is the global plan:\n{phase_plan_actions}\n\nYour task is to execute the following phase:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
+                'task': f'The user message is: {self.initial_task_str[0]}.\nThis is the global plan:\n{phase_plan_actions}\n\nYour task is to execute the following phase:\n{phase_to_execute}: {phase_plan_json[phase_to_execute]}'
             },
-            action_suffix='',
+            action_suffix='phase_plan',
         )

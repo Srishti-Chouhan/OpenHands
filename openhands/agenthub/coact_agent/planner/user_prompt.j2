@@ -5,8 +5,11 @@ USER: I want to go to the user 'Every-Hands-AI' github profile using browser and
 
 ASSISTANT:
 I have enough information, let's create a plan to achieve the task:
+
 # Phases
+
 <execute_global_plan>
+
 {
     "Phase 1": {
         "reason": "As the first step, we need to identify the number of repositories in the user's GitHub profile.",
@@ -15,6 +18,7 @@ I have enough information, let's create a plan to achieve the task:
         "status": "assigned",
         "feedback": "in progress"
     },
+
     "Phase 2": {
         "reason": "The number of repositories should be stored in a file as requested by the user.",
         "description": "Create a new file `repo_count.txt` and write the number of repositories to it.",
@@ -23,6 +27,7 @@ I have enough information, let's create a plan to achieve the task:
         "feedback": "in progress"
     }
 }
+
 </execute_global_plan>
 
 USER:
@@ -37,8 +42,11 @@ Sorry, the correct github handle is "All-Hands-AI".
 
 ASSISTANT:
 Let's create a new plan to achieve the task:
+
 # Phases
+
 <execute_global_plan>
+
 {
     "Phase 1": {
         "reason": "As the first step, we need to identify the number of repositories in the user's GitHub profile.",
@@ -47,6 +55,7 @@ Let's create a new plan to achieve the task:
         "status": "assigned",
         "feedback": "in progress",
     },
+
     "Phase 2": {
         "reason": "The number of repositories should be stored in a file as requested by the user.",
         "description": "Create a new file `repo_count.txt` and write the number of repositories to it.",
@@ -55,6 +64,7 @@ Let's create a new plan to achieve the task:
         "feedback": "in progress",
     }
 }
+
 </execute_global_plan>
 
 USER:
@@ -96,8 +106,11 @@ OBSERVATION:
 
 ASSISTANT:
 Great! Seems like the existing Python file `app.py` is ready to display a list of numbers from 1 to 10, but it's missing the code to start the web server. Let me create a plan to achieve the task:
+
 # Phases
+
 <execute_global_plan>
+
 {
     "Phase 1":
         {
@@ -109,6 +122,7 @@ Great! Seems like the existing Python file `app.py` is ready to display a list o
             "status": "assigned",
             "feedback": "in progress",
         }
+
     "Phase 2":
         {
             "reason": "After updating the Python file, we need to run it to display the list of numbers on a web page. The command a shell command can be: `python3 app.py`.",
@@ -118,6 +132,7 @@ Great! Seems like the existing Python file `app.py` is ready to display a list o
             "feedback": "in progress",
         }
 }
+
 </execute_global_plan>
 
 USER:
@@ -134,8 +149,11 @@ USER: Now browse the newly started server's homepage and show me the content.
 
 ASSISTANT:
 Sure, let me create a plan to achieve the task:
+
 # Phases
+
 <execute_global_plan>
+
 {
     "Phase 1": {
         "reason": "To verify that the server is running and displaying the list of numbers correctly, we need to browse the server's homepage. We can use the `execute_browse` function to access the URL.",
@@ -145,6 +163,7 @@ Sure, let me create a plan to achieve the task:
         "expected_state": "The content of the server's homepage is retrieved."
     }
 }
+
 </execute_global_plan>
 
 USER:
@@ -160,8 +179,11 @@ USER: Now kill the server, make it display the numbers in a table format.
 
 ASSISTANT:
 Sure! Let me create a plan to achieve the task:
+
 # Phases
+
 <execute_global_plan>
+
 {
     "Phase 1": {
         "reason": "The server needs to be stopped before modifying the Python code.",
@@ -170,6 +192,7 @@ Sure! Let me create a plan to achieve the task:
         "status": "assigned",
         "feedback": "in progress"
     },
+
     "Phase 2": {
         "reason": "The current code returns the numbers as a string, which is incorrect. We need to modify it, starting at line 6, to display the numbers in a table format by using HTML tags for table rows and cells.",
         "description": "Modify the Python code to display the numbers in a table format.",
@@ -177,6 +200,7 @@ Sure! Let me create a plan to achieve the task:
         "file_path": "/workspace/app.py",
         "expected_content": "6|    numbers = list(range(1, 11))\n7|    return \"<table>\" + \"\".join([f\"<tr><td>{num}</td></tr>\" for num in numbers]) + \"</table>\""
     },
+
     "Phase 3": {
         "reason": "After modifying the Python code, we need to run the file again to display the numbers in the expected table format.",
         "description": "Run the Python file again to display the numbers in a table format on the web page at port 5000.",
@@ -185,6 +209,7 @@ Sure! Let me create a plan to achieve the task:
         "feedback": "in progress"
     }
 }
+
 </execute_global_plan>
 
 USER:
@@ -201,6 +226,7 @@ The server is running on port 5000 with PID 126. You can access the list of numb
 
 --- END OF EXAMPLE 2 ---
 {% endset %}
+{# Generate phases with newlines between them as shown #}
 Here is an example of how you can interact with the environment for task solving:
 {{ DEFAULT_EXAMPLE }}
 {% if micro_agent %}

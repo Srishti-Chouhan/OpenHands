@@ -103,7 +103,9 @@ class CoActActionParserPhaseTransition(ActionParser):
 
         phase_transition_request = self.request.group(1).strip()
 
-        # print(f'###################\nphase transition request: {phase_transition_request}\n###################\n\n')
+        print(
+            f'###################\nphase transition request: {phase_transition_request}\n###################\n\n'
+        )
 
         # Use the phase_plan_parser to parse the phase plan action
         if self.phase_plan_parser.check_condition(phase_transition_request):
