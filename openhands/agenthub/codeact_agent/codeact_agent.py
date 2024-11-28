@@ -86,6 +86,8 @@ class CodeActAgent(Agent):
         super().__init__(llm, config)
         self.reset()
 
+        self.action_parser = CodeActResponseParser()
+
         self.micro_agent = (
             MicroAgent(
                 os.path.join(
@@ -97,6 +99,7 @@ class CodeActAgent(Agent):
         )
 
         self.function_calling_active = self.config.function_calling
+
         if self.function_calling_active and not self.llm.is_function_calling_active():
             logger.warning(
                 f'Function calling not supported for model {self.llm.config.model}. '
@@ -128,6 +131,13 @@ class CodeActAgent(Agent):
             self.initial_user_message = self.prompt_manager.initial_user_message
 
         self.pending_actions: deque[Action] = deque()
+
+        self.params: dict = {}
+        self.messages: list[Message] = []
+
+        # if not self.function_calling_active:
+        self.params['stop'] = []
+        self.initial_task_str = ['']
 
     def get_action_message(
         self,
@@ -343,20 +353,31 @@ class CodeActAgent(Agent):
 
         # prepare what we want to send to the LLM
         messages = self._get_messages(state)
-        params: dict = {
-            'messages': self.llm.format_messages_for_llm(messages),
-        }
+        # self.params = {
+        #     'messages': self.llm.format_messages_for_llm(messages),
+        # }
+
+        # self.params.update(
+        #     {
+        #         'messages': self.llm.format_messages_for_llm(messages),
+        #     }
+        # )
+
+        self.params['messages'] = self.llm.format_messages_for_llm(messages)
+
         if self.function_calling_active:
-            params['tools'] = self.tools
-            params['parallel_tool_calls'] = False
+            self.params['tools'] = self.tools
+            self.params['parallel_tool_calls'] = False
         else:
-            params['stop'] = [
-                '</execute_ipython>',
-                '</execute_bash>',
-                '</execute_browse>',
-                '</file_edit>',
-            ]
-        response = self.llm.completion(**params)
+            self.params['stop'].extend(
+                [
+                    '</execute_ipython>',
+                    '</execute_bash>',
+                    '</execute_browse>',
+                    '</file_edit>',
+                ]
+            )
+        response = self.llm.completion(**self.params)
 
         if self.function_calling_active:
             actions = codeact_function_calling.response_to_actions(response)
@@ -398,29 +419,61 @@ class CodeActAgent(Agent):
             - Messages from the same role are combined to prevent consecutive same-role messages
             - For Anthropic models, specific messages are cached according to their documentation
         """
-        messages: list[Message] = [
+        # messages: list[Message] = [
+        #     Message(
+        #         role='system',
+        #         content=[
+        #             TextContent(
+        #                 text=self.system_prompt,
+        #                 cache_prompt=self.llm.is_caching_prompt_active(),  # Cache system prompt
+        #             )
+        #         ],
+        #     )
+        # ]
+
+        if state.inputs.get('task') is not None:
+            self.initial_task_str = [state.inputs['task']]
+        # print(
+        #     f'\n\n###############\nThis is initial task str: {self.initial_task_str}\n###############\n\n'
+        # )
+
+        self.messages.append(
             Message(
                 role='system',
                 content=[
                     TextContent(
                         text=self.system_prompt,
-                        cache_prompt=self.llm.is_caching_prompt_active(),  # Cache system prompt
+                        # cache_prompt=self.llm.is_caching_prompt_active(),  # Cache system prompt
                     )
                 ],
             )
-        ]
+        )
         if self.initial_user_message:
-            messages.append(
-                Message(
-                    role='user',
-                    content=[TextContent(text=self.initial_user_message)],
+            if self.initial_task_str[0]:
+                message_to_append = (
+                    self.initial_user_message
+                    + f'\n\nThe user task is: {self.initial_task_str[0]}.'
                 )
-            )
+                self.messages.append(
+                    Message(
+                        role='user',
+                        content=[TextContent(text=message_to_append)],
+                    )
+                )
+            else:
+                self.messages.append(
+                    Message(
+                        role='user',
+                        content=[TextContent(text=self.initial_user_message)],
+                    )
+                )
 
         pending_tool_call_action_messages: dict[str, Message] = {}
         tool_call_id_to_message: dict[str, Message] = {}
         events = list(state.history.get_events())
+        print(f'\n\n###############\nEvents: {events}\n###############\n\n')
         for event in events:
+            # print(f'\n\n###############\nevent: {event}\n###############\n\n')
             # create a regular message from an event
             if isinstance(event, Action):
                 messages_to_add = self.get_action_message(
@@ -434,6 +487,8 @@ class CodeActAgent(Agent):
                 )
             else:
                 raise ValueError(f'Unknown event type: {type(event)}')
+
+            # print(f'\n\n###############\nmessages_to_add_1: {messages_to_add}\n###############\n\n')
 
             # Check pending tool call action messages and see if they are complete
             _response_ids_to_remove = []
@@ -461,6 +516,8 @@ class CodeActAgent(Agent):
             for response_id in _response_ids_to_remove:
                 pending_tool_call_action_messages.pop(response_id)
 
+            # print(f'\n\n###############\nmessages_to_add:_2 {messages_to_add}\n###############\n\n')
+
             for message in messages_to_add:
                 # add regular message
                 if message:
@@ -468,21 +525,24 @@ class CodeActAgent(Agent):
                     # litellm.exceptions.BadRequestError: litellm.BadRequestError: OpenAIException - Error code: 400 - {'detail': 'Only supports u/a/u/a/u...'}
                     # there shouldn't be two consecutive messages from the same role
                     # NOTE: we shouldn't combine tool messages because each of them has a different tool_call_id
+                    if message.role == 'user' and not self.initial_task_str[0]:
+                        self.initial_task_str[0] = message.content[0].text
                     if (
-                        messages
-                        and messages[-1].role == message.role
+                        self.messages
+                        and self.messages[-1].role == message.role
                         and message.role != 'tool'
                     ):
-                        messages[-1].content.extend(message.content)
+                        self.messages[-1].content.extend(message.content)
                     else:
-                        messages.append(message)
+                        self.messages.append(message)
 
         if self.llm.is_caching_prompt_active():
             # NOTE: this is only needed for anthropic
             # following logic here:
             # https://github.com/anthropics/anthropic-quickstarts/blob/8f734fd08c425c6ec91ddd613af04ff87d70c5a0/computer-use-demo/computer_use_demo/loop.py#L241-L262
+            # print(f'\n\n###############\nI am in cache prompting\n###############\n\n')
             breakpoints_remaining = 3  # remaining 1 for system/tool
-            for message in reversed(messages):
+            for message in reversed(self.messages):
                 if message.role == 'user' or message.role == 'tool':
                     if breakpoints_remaining > 0:
                         message.content[
@@ -499,7 +559,7 @@ class CodeActAgent(Agent):
                 islice(
                     (
                         m
-                        for m in reversed(messages)
+                        for m in reversed(self.messages)
                         if m.role == 'user'
                         and any(isinstance(c, TextContent) for c in m.content)
                     ),
@@ -511,5 +571,8 @@ class CodeActAgent(Agent):
             if latest_user_message:
                 reminder_text = f'\n\nENVIRONMENT REMINDER: You have {state.max_iterations - state.iteration} turns left to complete the task. When finished reply with <finish></finish>.'
                 latest_user_message.content.append(TextContent(text=reminder_text))
+        # print(f'\n\n###############\nMessages: {len(self.messages)}\n###############\n\n')
 
-        return messages
+        # print(f'\n\n###############\nMessages: {self.messages}\n###############\n\n')
+        # return self.messages
+        return self.messages
