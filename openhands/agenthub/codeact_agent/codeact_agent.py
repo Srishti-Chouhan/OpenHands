@@ -471,7 +471,7 @@ class CodeActAgent(Agent):
         pending_tool_call_action_messages: dict[str, Message] = {}
         tool_call_id_to_message: dict[str, Message] = {}
         events = list(state.history.get_events())
-        print(f'\n\n###############\nEvents: {events}\n###############\n\n')
+        # print(f'\n\n###############\nEvents: {events}\n###############\n\n')
         for event in events:
             # print(f'\n\n###############\nevent: {event}\n###############\n\n')
             # create a regular message from an event
