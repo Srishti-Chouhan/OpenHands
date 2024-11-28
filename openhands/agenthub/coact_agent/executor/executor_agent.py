@@ -15,7 +15,7 @@ class LocalExecutorAgent(CodeActAgent):
         # llm.config.model = 'anthropic/neulab/claude-3-5-sonnet-20241022'
         super().__init__(llm, config)
 
-        self.function_calling_active = False
+        # self.function_calling_active = False
 
         self.action_parser = ExecutorResponseParser()
         self.prompt_manager = PromptManager(

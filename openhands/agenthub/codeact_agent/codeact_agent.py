@@ -96,8 +96,8 @@ class CodeActAgent(Agent):
             else None
         )
 
-        # self.function_calling_active = self.config.function_calling
-        self.function_calling_active = False
+        self.function_calling_active = self.config.function_calling
+
         if self.function_calling_active and not self.llm.is_function_calling_active():
             logger.warning(
                 f'Function calling not supported for model {self.llm.config.model}. '
@@ -419,9 +419,9 @@ class CodeActAgent(Agent):
 
         if state.inputs.get('task') is not None:
             self.initial_task_str = [state.inputs['task']]
-        print(
-            f'\n\n###############\nThis is initial task str: {self.initial_task_str}\n###############\n\n'
-        )
+        # print(
+        #     f'\n\n###############\nThis is initial task str: {self.initial_task_str}\n###############\n\n'
+        # )
 
         self.messages.append(
             Message(
@@ -459,7 +459,7 @@ class CodeActAgent(Agent):
         events = list(state.history.get_events())
         print(f'\n\n###############\nEvents: {events}\n###############\n\n')
         for event in events:
-            print(f'\n\n###############\nevent: {event}\n###############\n\n')
+            # print(f'\n\n###############\nevent: {event}\n###############\n\n')
             # create a regular message from an event
             if isinstance(event, Action):
                 messages_to_add = self.get_action_message(
@@ -526,6 +526,7 @@ class CodeActAgent(Agent):
             # NOTE: this is only needed for anthropic
             # following logic here:
             # https://github.com/anthropics/anthropic-quickstarts/blob/8f734fd08c425c6ec91ddd613af04ff87d70c5a0/computer-use-demo/computer_use_demo/loop.py#L241-L262
+            # print(f'\n\n###############\nI am in cache prompting\n###############\n\n')
             breakpoints_remaining = 3  # remaining 1 for system/tool
             for message in reversed(self.messages):
                 if message.role == 'user' or message.role == 'tool':
@@ -556,5 +557,8 @@ class CodeActAgent(Agent):
             if latest_user_message:
                 reminder_text = f'\n\nENVIRONMENT REMINDER: You have {state.max_iterations - state.iteration} turns left to complete the task. When finished reply with <finish></finish>.'
                 latest_user_message.content.append(TextContent(text=reminder_text))
+        # print(f'\n\n###############\nMessages: {len(self.messages)}\n###############\n\n')
 
+        # print(f'\n\n###############\nMessages: {self.messages}\n###############\n\n')
+        # return self.messages
         return self.messages

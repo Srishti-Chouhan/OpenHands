@@ -26,7 +26,7 @@ class GlobalPlannerAgent(CodeActAgent):
         #     initial_task_str=self.initial_task_str
         # )
 
-        self.function_calling_active = False
+        # self.function_calling_active = False
 
         self.action_parser = PlannerResponseParser(
             initial_task_str=self.initial_task_str

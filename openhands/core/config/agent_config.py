@@ -18,7 +18,7 @@ class AgentConfig:
         llm_config: The name of the llm config to use. If specified, this will override global llm config.
     """
 
-    function_calling: bool = True
+    function_calling: bool = False
     codeact_enable_browsing_delegate: bool = True
     codeact_enable_llm_editor: bool = False
     codeact_enable_jupyter: bool = True

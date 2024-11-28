@@ -77,8 +77,8 @@ class CodeActResponseParser(ResponseParser):
         elif isinstance(action, IPythonRunCellAction):
             return f'{action.thought}\n<execute_ipython>\n{action.code}\n</execute_ipython>'
         elif isinstance(action, AgentDelegateAction):
-            # return f'{action.thought}\n<execute_browse>\n{action.inputs["task"]}\n</execute_browse>'
-            return f'{action.thought}\n<execute_{action.action_suffix}>\n{action.inputs["task"]}\n</execute_{action.action_suffix}>'
+            return f'{action.thought}\n<execute_browse>\n{action.inputs["task"]}\n</execute_browse>'
+            # return f'{action.thought}\n<execute_{action.action_suffix}>\n{action.inputs["task"]}\n</execute_{action.action_suffix}>'
         elif isinstance(action, FileEditAction):
             return f'{action.thought}\n<file_edit path={action.path}>\n{action.content}\n</file_edit>'
         elif isinstance(action, MessageAction):

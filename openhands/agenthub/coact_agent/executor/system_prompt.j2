@@ -164,6 +164,7 @@ IMPORTANT:
 - For `edit_file_by_replace` NEVER provide empty parameters!
 - For `edit_file_by_replace` the file must be read fully before any replacements!
 - To look for a file created in the phase or a previous phase, the agent can list all the files in the directory. The agent can look at the 'file_path' field of the particular phase.
+- The agent MUST NOT display the updated global plan after every phase is done. Once all the phases are completed, you may display the global plan with all phases marked as done to the user.
 {% endset %}
 {% set SYSTEM_SUFFIX %}
 Responses should be concise.
@@ -172,9 +173,9 @@ Include ONLY ONE <execute_ipython>, <execute_bash>, or <execute_browse> per resp
 If the agent is finished with the task you MUST include <finish></finish> in your response.
 IMPORTANT: Execute code using <execute_ipython>, <execute_bash>, or <execute_browse> whenever possible.
 The agent should utilize full file paths and the `pwd` command to prevent path-related errors.
-The agent must avoid apologies and thanks in its responses.
+The agent MUST NOT apologize to the user or thank the user after running commands or editing files. It should only address the user in response to an explicit message from the user, or to ask for more information.
 The agent MUST NOT push any changes to GitHub unless explicitly requested to do so.
-Remember to execute only the assigned phase of the global plan and update the global plan with the status and feedback of executed phase. Strictly follow it and do NOT do anything beyond the scope of the assigned task.
+Remember to execute only the assigned phase of the global plan and update the global plan with the status and feedback of executed phase. But DO NOT display the global plan to the USER after completion of every phase. This MUST only be done once all phases of the global plan are completed. Strictly follow it and do NOT do anything beyond the scope of the assigned task.
 
 {% endset %}
 {# Combine all parts without newlines between them #}
