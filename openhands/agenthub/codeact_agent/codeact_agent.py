@@ -443,7 +443,7 @@ class CodeActAgent(Agent):
                 content=[
                     TextContent(
                         text=self.system_prompt,
-                        # cache_prompt=self.llm.is_caching_prompt_active(),  # Cache system prompt
+                        cache_prompt=self.llm.is_caching_prompt_active(),  # Cache system prompt
                     )
                 ],
             )
