@@ -443,37 +443,38 @@ class CodeActAgent(Agent):
                 content=[
                     TextContent(
                         text=self.system_prompt,
-                        cache_prompt=self.llm.is_caching_prompt_active(),  # Cache system prompt
+                        cache_prompt=not self.llm.is_caching_prompt_active(),  # Cache system prompt
                     )
                 ],
             )
         )
         if self.initial_user_message:
-            if self.initial_task_str[0]:
-                message_to_append = (
-                    self.initial_user_message
-                    + f'\n\nThe user task is: {self.initial_task_str[0]}.'
+            # if self.initial_task_str[0]:
+            #     message_to_append = (
+            #         self.initial_user_message
+            #         + f'\n\nThe user task is: {self.initial_task_str[0]}.'
+            #     )
+            #     self.messages.append(
+            #         Message(
+            #             role='user',
+            #             content=[TextContent(text=message_to_append)],
+            #         )
+            #     )
+            # else:
+            self.messages.append(
+                Message(
+                    role='user',
+                    content=[TextContent(text=self.initial_user_message)],
                 )
-                self.messages.append(
-                    Message(
-                        role='user',
-                        content=[TextContent(text=message_to_append)],
-                    )
-                )
-            else:
-                self.messages.append(
-                    Message(
-                        role='user',
-                        content=[TextContent(text=self.initial_user_message)],
-                    )
-                )
+            )
 
         pending_tool_call_action_messages: dict[str, Message] = {}
         tool_call_id_to_message: dict[str, Message] = {}
         events = list(state.history.get_events())
+        if not events:
+            events = [MessageAction(content=self.initial_task_str[0])]
         # print(f'\n\n###############\nEvents: {events}\n###############\n\n')
         for event in events:
-            # print(f'\n\n###############\nevent: {event}\n###############\n\n')
             # create a regular message from an event
             if isinstance(event, Action):
                 messages_to_add = self.get_action_message(
@@ -536,21 +537,21 @@ class CodeActAgent(Agent):
                     else:
                         self.messages.append(message)
 
-        if self.llm.is_caching_prompt_active():
-            # NOTE: this is only needed for anthropic
-            # following logic here:
-            # https://github.com/anthropics/anthropic-quickstarts/blob/8f734fd08c425c6ec91ddd613af04ff87d70c5a0/computer-use-demo/computer_use_demo/loop.py#L241-L262
-            # print(f'\n\n###############\nI am in cache prompting\n###############\n\n')
-            breakpoints_remaining = 3  # remaining 1 for system/tool
-            for message in reversed(self.messages):
-                if message.role == 'user' or message.role == 'tool':
-                    if breakpoints_remaining > 0:
-                        message.content[
-                            -1
-                        ].cache_prompt = True  # Last item inside the message content
-                        breakpoints_remaining -= 1
-                    else:
-                        break
+        # if self.llm.is_caching_prompt_active():
+        #     # NOTE: this is only needed for anthropic
+        #     # following logic here:
+        #     # https://github.com/anthropics/anthropic-quickstarts/blob/8f734fd08c425c6ec91ddd613af04ff87d70c5a0/computer-use-demo/computer_use_demo/loop.py#L241-L262
+        #     # print(f'\n\n###############\nI am in cache prompting\n###############\n\n')
+        #     breakpoints_remaining = 2  # remaining 1 for system/tool
+        #     for message in reversed(self.messages):
+        #         if message.role == 'user' or message.role == 'tool':
+        #             if breakpoints_remaining > 0:
+        #                 message.content[
+        #                     -1
+        #                 ].cache_prompt = True  # Last item inside the message content
+        #                 breakpoints_remaining -= 1
+        #             else:
+        #                 break
 
         if not self.function_calling_active:
             # The latest user message is important:

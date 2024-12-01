@@ -41,6 +41,7 @@ class SandboxConfig:
     runtime_container_image: str | None = None
     user_id: int = os.getuid() if hasattr(os, 'getuid') else 1000
     timeout: int = 120
+    remote_runtime_init_timeout: int = 180
     enable_auto_lint: bool = (
         False  # once enabled, OpenHands would lint files after editing
     )
